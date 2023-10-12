@@ -1,10 +1,15 @@
 #########
 __author__ = "Drew Banyai <DrewBanyai@gmail.com>"
-__version__ = "v0.01"
+__version__ = "v0.02"
 #########
 
-#  These installs are needed behind the scenes by other modules, so lets force their install first
+#  If we've passed in an argument, use the first argument to set the current working directory
+import sys
 import os
+if (len(sys.argv) > 1):
+    os.chdir(sys.argv[1])
+
+#  These installs are needed behind the scenes by other modules, so lets force their install first
 os.system('pip install pypiwin32')
 os.system('pip install playsound')
 os.system('pip install pyaudio')
