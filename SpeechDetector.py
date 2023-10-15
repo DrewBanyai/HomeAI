@@ -29,7 +29,7 @@ class SpeechDetector:
         self.Recognizer = sr.Recognizer()
         self.Recognizer.vosk_model = Model("model")
         self.Recognizer.pause_threshold = 1
-        self.Recognizer.energy_threshold = 300
+        self.Recognizer.energy_threshold = 250
         self.Recognizer.dynamic_energy_threshold = False
         self.Microphone = sr.Microphone(0)
         

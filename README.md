@@ -1,3 +1,5 @@
+![](Cover.png)
+
 # HomeAI
 A python-based offline AI assistant program, built to replace Alexa for daily tasks
 
