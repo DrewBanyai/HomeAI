@@ -1,0 +1,6 @@
+pypiwin32
+pywin32
+playsound
+pyaudio
+pyttsx3
+comtypes

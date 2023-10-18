@@ -9,12 +9,6 @@ import os
 if (len(sys.argv) > 1):
     os.chdir(sys.argv[1])
 
-#  These installs are needed behind the scenes by other modules, so lets force their install first
-os.system('pip install pypiwin32')
-os.system('pip install playsound')
-os.system('pip install pyaudio')
-os.system('pip install pyttsx3')
-
 #  Import Helper functionality
 from Helper import *
 

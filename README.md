@@ -4,7 +4,7 @@
 A python-based offline AI assistant program, built to replace Alexa for daily tasks
 
 ## Issuing Queries
-All queries are initiated with a query string and should begin with referring to the AI by name. By default, it's name is "Computer", so a query like "Can you hear me" would be issued by saying "Computer. Can you hear me?"
+All queries are initiated with a query string and should begin with referring to the AI by name. By default, it's name is "Frank", so a query like "Can you hear me" would be issued by saying "Frank. Can you hear me?"
 
 ### Known Query Strings
 * **"Can you hear me"** - Will answer with an affirmative if the program is online and listening properly
@@ -25,4 +25,4 @@ If you'd like the full functionality of the bot, you'll need to sign up for a fe
 - For cryptocurrency prices, you'll need to sign up for a free API key at https://www.coinapi.io/
     - Note: This is not the same as signing up for a full account and then selecting the free tier. Just go to the main page and select free without an account to generate a key.
 - You'll want to assign any crypto pairs you want to check the price of. For starters, I've put in BTC->USD but you can put in whatever you'd like. I've included a few commented out to try.
-- If you want to refer to your HomeAI instance by a name other than "Computer", you can set that in _env.py, but you should also alter the AINameAlternates list in CommandAlternates.py
+- If you want to refer to your HomeAI instance by a name other than "Frank", you can set that in _env.py, but you should also alter the AINameAlternates list in CommandAlternates.py
