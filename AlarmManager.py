@@ -11,6 +11,7 @@ class AlarmManager:
         print("[Alarm Manager] initialized")
         self.AlarmList = []
         self.AlarmCallback = alarmCallback
+        self.Exit = False
         Timer(1.0, self.AlarmCheck).start()
 
     def AlarmCheck(self):
@@ -20,7 +21,8 @@ class AlarmManager:
             if (alarm.AlarmTime <= dt):
                 self.AlarmCallback(alarm.AlarmSetting + " alarm complete")
         self.AlarmList = list(filter(lambda a: a.AlarmTime > dt, self.AlarmList))
-        Timer(1.0, self.AlarmCheck).start()
+        if (self.Exit == False):
+            Timer(1.0, self.AlarmCheck).start()
 
     def SetAlarm(self, alarmSetting, alarmTime):
         print("SetAlarm", alarmTime)

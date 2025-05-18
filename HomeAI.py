@@ -26,7 +26,7 @@ class HomeAI:
         self.Listening = False
         self.Exit = False
         self.SpeechQueue = []
-        self.AlarmManager = AlarmManager(self.AddSpeechString)
+        self.AlarmManager = None
         self.Initialize()
 
 
@@ -57,18 +57,19 @@ class HomeAI:
     def Initialize(self):
         print("Initializing:")
 
+        print("Loading Alarm Manager system...")
+        self.AlarmManager = AlarmManager(self.AddSpeechString)
+
         print("Loading Text to Speech generation system...")
         self.TextToSpeech = TextToSpeech()
 
         print("Loading speech recognition system...")
         self.SpeechDetector = SpeechDetector()
 
-        print("Initialization Complete: Home AI is ready to begin listening...")
+        print("Initialization Complete")
 
         #print("Greeting user...")
         #self.TextToSpeech.Speak(GeneralGreeting())
-
-        self.MainLoop()
 
 
     def MainLoop(self):
@@ -88,7 +89,11 @@ class HomeAI:
                     self.Exit = True
                 else:
                     print("Beginning to listen using speech recognition system...\n")
+
+        self.AlarmManager.Exit = True
         self.SpeechDetector.StopListening(True)
 
-#  Instantiate the AI
+
+#  Instantiate the AI and begin its main loop
 homeAI = HomeAI()
+homeAI.MainLoop()
