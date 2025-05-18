@@ -1,11 +1,5 @@
-import os
-
 #  Import Offline Text to Speech through pyttsx3
-try:
-    import pyttsx3
-except:
-    os.system('pip install pyttsx3')
-    import pyttsx3
+import pyttsx3
 
 
 class TextToSpeech:

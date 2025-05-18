@@ -24,6 +24,8 @@ def GetCryptoName(name):
 PRONUNCIATION_WORDS_TO_NUMBERS = {
     "one": 1,
     "two": 2,
+    "to": 2,
+    "too": 2,
     "three": 3,
     "four": 4,
     "five": 5,
@@ -51,28 +53,3 @@ PRONUNCIATION_WORDS_TO_NUMBERS = {
     "ninety": 90,
     "oh": 0,
 }
-
-#  Words that, when in a number formed by two words, can be the first word
-PRONUNCIATION_WORDS_PART_1_OF_2 = [
-    "twenty",
-    "thirty",
-    "forty",
-    "fifty",
-    "sixty",
-    "seventy",
-    "eighty",
-    "ninety",
-]
-
-#  Words that, when in a number formed by two words, can be the second word
-PRONUNCIATION_WORDS_PART_2_OF_2 = [
-    "one",
-    "two",
-    "three",
-    "four",
-    "five",
-    "six",
-    "seven",
-    "eight",
-    "nine",
-]

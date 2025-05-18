@@ -9,6 +9,7 @@ All queries are initiated with a query string and should begin with referring to
 ### Known Query Strings
 * **"Can you hear me"** - Will answer with an affirmative if the program is online and listening properly
 * **"What time is it"** - Will answer with the current time. By default, this is in Eastern Standard Time, but you can change this setting in code
+* **"Set an alarm for XXX"** - Will allow you to set an alarm for a certain time. You must describe a full time, including AM or PM. For example: "Set an alarm for seven fifteen pm"
 * **"Give me the headlines"** - Will answer with the top headlines from the Associated Press news feed (if Open News API key is provided in _env.py)
 * **"Get crypto prices"** - Will give the current exchange rates between asset pairs (if a list of CRYPTO_ASSET_PAIRS and a COIN_API_KEY has been provided in _env.py)
 * **"Send a test email"** - Will send an email from your GMAIL_EMAIL to your GMAIL_EMAIL with a test subject and message. You may customize this as you wish.
@@ -16,7 +17,6 @@ All queries are initiated with a query string and should begin with referring to
 
 ### Command Alternates
 A number of commands have common mistranslations, so this project includes a number of command alternates in CommandAlternates.py which map back to the actual command. You may add more as needed. This file also includes AI name alternates, so if you change the AI name, you may want to add some alternate values for that as well.
-
 
 ### Initial Setup
 If you'd like the full functionality of the bot, you'll need to sign up for a few free services and put some information into the _env.py file.

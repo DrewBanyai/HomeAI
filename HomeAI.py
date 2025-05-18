@@ -16,16 +16,17 @@ from Helper import *
 from SpeechDetector import SpeechDetector
 from TextToSpeech import TextToSpeech
 from Commands import ExecuteCommand
+from AlarmManager import AlarmManager
 
 #  The primary HomeAI class
 class HomeAI:
     def __init__(self):
         self.TextToSpeech = None
         self.SpeechDetector = None
-        self.StopListening = None
         self.Listening = False
         self.Exit = False
         self.SpeechQueue = []
+        self.AlarmManager = AlarmManager(self.AddSpeechString)
         self.Initialize()
 
 
@@ -38,7 +39,7 @@ class HomeAI:
         
         #  Determine the command after the AI name in the full voice text, then pass it to our command execution function.
         queryString = queryCheck[1]
-        if (ExecuteCommand(queryString, self.AddSpeechString, self.Shutdown) == False):
+        if (ExecuteCommand(queryString, self.AddSpeechString, self.Shutdown, self.SetAlarm) == False):
             print("Unknown Query Detected: " + queryString)
 
 
@@ -48,6 +49,9 @@ class HomeAI:
     def Shutdown(self):
         print("Shutting down program...")
         self.Exit = True
+
+    def SetAlarm(self, alarmSetting, alarmTime):
+        self.AlarmManager.SetAlarm(alarmSetting, alarmTime)
 
 
     def Initialize(self):
@@ -61,8 +65,8 @@ class HomeAI:
 
         print("Initialization Complete: Home AI is ready to begin listening...")
 
-        print("Greeting user...")
-        self.TextToSpeech.Speak(GeneralGreeting())
+        #print("Greeting user...")
+        #self.TextToSpeech.Speak(GeneralGreeting())
 
         self.MainLoop()
 
@@ -84,6 +88,7 @@ class HomeAI:
                     self.Exit = True
                 else:
                     print("Beginning to listen using speech recognition system...\n")
+        self.SpeechDetector.StopListening(True)
 
 #  Instantiate the AI
 homeAI = HomeAI()

@@ -1,21 +1,13 @@
 import threading
-from Helper import IsJSON
 import json
-import os
 
 #  Import Offline Speech Recognizer (through Vosk)
-try:
-    import speech_recognition as sr
-except:
-    os.system('pip install speechRecognition')
-    import speech_recognition as sr
+import speech_recognition as sr
 
 #  Import Vosk module
-try:
-    from vosk import Model
-except:
-    os.system('pip install vosk')
-    from vosk import Model
+from vosk import Model
+
+from Helper import IsJSON
 
 
 class SpeechDetector:
@@ -23,6 +15,7 @@ class SpeechDetector:
         self.Recognizer = None
         self.Microphone = None
         self.QueryCallback = None
+        self.Exit = False
         self.Initialize()
 
     def Initialize(self):

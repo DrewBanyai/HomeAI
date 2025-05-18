@@ -3,19 +3,13 @@ import datetime
 import json
 import smtplib
 import time
-import os
 from email.message import EmailMessage
+import requests
 from playsound import *
 
 from CommandAlternates import AINameAlternates
 from Pronunciation import *
-
-#  Import requests functionality
-try:
-    import requests
-except:
-    os.system('pip install requests')
-    import requests
+from ConvertStringToTime import ConvertStringToTime
 
 from _env import NEWS_API_KEY, GMAIL_EMAIL, GMAIL_APP_PASSWORD, AI_NAME, COIN_API_KEY, CRYPTO_ASSET_PAIRS
 
@@ -59,6 +53,16 @@ def GeneralTimeOfDay():
         return "Afternoon"
     else:
         return "Evening"
+    
+def StringToTime(string):
+    return ConvertStringToTime(string)
+
+def ConvertHourTo24Hour(hour, ap):
+    return hour - (12 if (hour == 12) else 0) + (0 if (ap == "am") else 12)
+
+
+def ChangeTime(dt, hour, minute, second, microsecond):
+    print("test")
 
 
 def IsAINameDefined():
@@ -165,6 +169,8 @@ def GetCryptoPrices(speechCallback):
         }
         response = HTTPGet(url, headers)
         responseJson = response.json()
+        if ('title' in responseJson and responseJson['title'] == 'Forbidden'):
+            raise Exception("403 Forbidden error when requesting crypto prices. Please check your Coin API Key and Account")
         priceList.append((GetCryptoName(c[0]), GetCryptoName(c[1]), str(round(responseJson["rate"], c[2]))))
     return priceList
 

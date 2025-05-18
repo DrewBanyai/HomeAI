@@ -14,5 +14,5 @@ CRYPTO_ASSET_PAIRS = [
 GMAIL_EMAIL = None
 GMAIL_APP_PASSWORD = None
 
-#  AI_NAME should be a string representing a word which you use to refer to the AI. By default, this is "Computer"
-AI_NAME = "Computer"
+#  AI_NAME should be a string representing a word which you use to refer to the AI. By default, this is "Frank"
+AI_NAME = "Frank"

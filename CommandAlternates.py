@@ -2,7 +2,7 @@ from _env import AI_NAME
 
 AINameAlternates = {
     AI_NAME.lower(): AI_NAME.lower(),
-    "peter": "computer"
+    "rank": "frank"
 }
 
 CommandAlternates = {
@@ -50,4 +50,27 @@ CommandAlternates = {
     "close program": "shut down",
     "stop program": "shut down",
     "turn off": "shut down",
+}
+
+PartialAlternates = {
+    #  SET AN ALARM FOR
+    "set an alarm for": "set an alarm for",
+    "set alarm for": "set an alarm for",
+    "set an alone for": "set an alarm for",
+    "set alone for": "set an alarm for",
+    "send an alarm for": "set an alarm for",
+    "send alarm for": "set an alarm for",
+    "set an no i'm for": "set an alarm for",
+    "set no i'm for": "set an alarm for",
+    "said an alarm for": "set an alarm for",
+    "said no alarm for": "set an alarm for",
+    "said no i'm for": "set an alarm for",
+    "said no arm for": "set an alarm for",
+    "said alarm for": "set an alarm for",
+    "set miller for": "set an alarm for",
+    "said in the line for": "set an alarm for",
+    "said no i am for": "set an alarm for",
+    "an alarm for": "set an alarm for",
+    "alarm for": "set an alarm for",
+    "sudden alarm for": "set an alarm for"
 }

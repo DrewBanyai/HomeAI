@@ -4,3 +4,6 @@ playsound
 pyaudio
 pyttsx3
 comtypes
+speechRecognition
+vosk
+requests
