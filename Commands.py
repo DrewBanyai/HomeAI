@@ -1,6 +1,7 @@
 from Helper import GetAIName, TellMeTheTime, StringToTime, GetNewsTopHeadlines, SendTestEmail, GetCryptoPrices, IsGmailLoginDefined
 from _env import GMAIL_EMAIL
 from CommandAlternates import CommandAlternates, PartialAlternates
+from WeatherForecast import SevenDayForecastString
 
 class CommandCallback:
     def __init__(self, callbackType, callback):
@@ -55,6 +56,11 @@ def ExecuteCommand(command, speechCallback, shutdownCallback, alarmCallback):
             SendTestEmail(GMAIL_EMAIL, "Subject Test", "This is a test email.")
         return True
     
+    if (command == "seven day forecast"):
+        forecast_string = SevenDayForecastString()
+        speechCallback(forecast_string)
+        return True
+
     if (command == "shut down"):
         shutdownCallback()
         return True

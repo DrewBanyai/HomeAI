@@ -50,6 +50,13 @@ CommandAlternates = {
     "close program": "shut down",
     "stop program": "shut down",
     "turn off": "shut down",
+
+    #  SEVEN DAY FORECAST
+    "weather forecast": "seven day forecast",
+    "what's the weather forecast": "seven day forecast",
+    "how's the weather for the next seven days": "seven day forecast",
+    "give me the weather report": "seven day forecast",
+    "what's the seven day forecast": "seven day forecast",
 }
 
 PartialAlternates = {

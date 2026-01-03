@@ -80,6 +80,7 @@ class HomeAI:
                 self.SpeechDetector.StopListening(True)
                 while (len(self.SpeechQueue) > 0):
                     text = self.SpeechQueue.pop(0)
+                    print("SPEECH: " + text)
                     self.TextToSpeech.Speak(text)
             
             if (self.Listening == False):
