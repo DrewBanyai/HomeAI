@@ -1,11 +1,12 @@
 import threading
 import json
+import os
 
 #  Import Offline Speech Recognizer (through Vosk)
 import speech_recognition as sr
 
 #  Import Vosk module
-from vosk import Model
+from vosk import Model, KaldiRecognizer
 
 from Helper import IsJSON
 
@@ -20,7 +21,6 @@ class SpeechDetector:
 
     def Initialize(self):
         self.Recognizer = sr.Recognizer()
-        self.Recognizer.vosk_model = Model("model")
         self.Recognizer.pause_threshold = 1
         self.Recognizer.energy_threshold = 250
         self.Recognizer.dynamic_energy_threshold = False
@@ -52,10 +52,20 @@ class SpeechDetector:
             return
         
         try:
-            query = recognizer.recognize_vosk(audio, language="en-in").lower()
-            if (IsJSON(query)):
-                resultDict = json.loads(query)
-                query = resultDict["text"]
+            # Create vosk model and recognizer
+            vosk_model = Model(os.path.join(os.getcwd(), "model"))
+            vosk_recognizer = KaldiRecognizer(vosk_model, audio.sample_rate)
+
+            # Process audio data
+            # speech_recognition's AudioData needs to be fed to vosk
+            raw_audio_data = audio.get_raw_data(convert_rate=audio.sample_rate, convert_width=2)
+            vosk_recognizer.AcceptWaveform(raw_audio_data)
+            
+            # Get result
+            result_json = vosk_recognizer.Result()
+            resultDict = json.loads(result_json)
+            query = resultDict["text"].lower()
+
             print("USER QUERY: \"" + query + "\"")
             if (self.QueryCallback != None and len(query) > 0):
                 self.QueryCallback(query)

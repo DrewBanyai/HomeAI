@@ -1,6 +1,6 @@
 pypiwin32
 pywin32
-playsound
+playsound3
 pyaudio
 pyttsx3
 comtypes

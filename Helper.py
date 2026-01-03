@@ -5,7 +5,7 @@ import smtplib
 import time
 from email.message import EmailMessage
 import requests
-from playsound import *
+from playsound3 import *
 
 from CommandAlternates import AINameAlternates
 from Pronunciation import *
