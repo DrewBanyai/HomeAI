@@ -17,7 +17,8 @@ GMAIL_APP_PASSWORD = None
 #  AI_NAME should be a string representing a word which you use to refer to the AI. By default, this is "Frank"
 AI_NAME = "Frank"
 
-WEATHER_API_CALL="https://api.open-meteo.com/v1/forecast?latitude=42.0695&longitude=-76.1547&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=America%2FNew_York&wind_speed_unit=mph&temperature_unit=fahrenheit&precipitation_unit=inch"
+WEATHER_API_SEVEN_DAY_CALL="https://api.open-meteo.com/v1/forecast?latitude=42.0695&longitude=-76.1547&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=America%2FNew_York&wind_speed_unit=mph&temperature_unit=fahrenheit&precipitation_unit=inch"
+WEATHER_API_SINGLE_DAY_CALL = "https://api.open-meteo.com/v1/forecast?latitude=42.0695&longitude=-76.1547&daily=weather_code,temperature_2m_max,temperature_2m_min&hourly=temperature_2m,weather_code&current=temperature_2m,weather_code&forecast_days=1&wind_speed_unit=mph&temperature_unit=fahrenheit&precipitation_unit=inch"
 
 WEATHER_CODES = {
     0: "Clear sky",
