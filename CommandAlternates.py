@@ -57,6 +57,15 @@ CommandAlternates = {
     "how's the weather for the next seven days": "seven day forecast",
     "give me the weather report": "seven day forecast",
     "what's the seven day forecast": "seven day forecast",
+
+    #  SINGLE DAY FORECAST
+    "weather forecast today": "single day forecast",
+    "weather forecasts today": "single day forecast",
+    "what's the weather": "single day forecast",
+    "what's the weather today": "single day forecast",
+    "how's the weather today": "single day forecast",
+    "give me the weather report for today": "single day forecast",
+    "what's the weather": "single day forecast",
 }
 
 PartialAlternates = {

@@ -1,13 +1,15 @@
 from Helper import GetAIName, TellMeTheTime, StringToTime, GetNewsTopHeadlines, SendTestEmail, GetCryptoPrices, IsGmailLoginDefined
 from _env import GMAIL_EMAIL
 from CommandAlternates import CommandAlternates, PartialAlternates
-from WeatherForecast import SevenDayForecastString
+from WeatherForecast import SevenDayForecastString, SingleDayForecastString
 
 class CommandCallback:
     def __init__(self, callbackType, callback):
         print("Command Callback __init__")
 
 def ExecuteCommand(command, speechCallback, shutdownCallback, alarmCallback):
+    print("Execute command: [" + command + "]")
+    
     #  If we use an alternate command, switch over to the official command string
     if (command in CommandAlternates):
         print("Switching command: [" + command + "] > [" + CommandAlternates[command] + "]")
@@ -58,6 +60,11 @@ def ExecuteCommand(command, speechCallback, shutdownCallback, alarmCallback):
     
     if (command == "seven day forecast"):
         forecast_string = SevenDayForecastString()
+        speechCallback(forecast_string)
+        return True
+    
+    if (command == "single day forecast"):
+        forecast_string = SingleDayForecastString()
         speechCallback(forecast_string)
         return True
 
