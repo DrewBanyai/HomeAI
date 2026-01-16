@@ -62,7 +62,8 @@ Footer {
 #main_container {
     height: 100%;
     width: 100%;
-    padding: 1 2;
+    padding: 1 1;
+    align: center top;
 }
 
 Button {
@@ -78,12 +79,12 @@ Button.-dark-mode {
 }
 
 #status {
-    margin: 1 0 0 0;
+    margin: 0 0 0 0;
 }
 
 #currently_playing {
-    margin: 1 0 0 0;
-    margin-bottom: 1;
+    margin: 0 0 0 0;
+    margin-bottom: 0;
     /* Add some space below currently playing */
 }
 
@@ -92,8 +93,8 @@ Button.-dark-mode {
     height: 9;
     /* 6 lines for history + 1 for title + 2 for borders */
     width: 100%;
-    margin-top: 1;
-    padding: 0 1;
+    margin-top: 0;
+    padding: 0 0;
     box-sizing: border-box;
     /* Include padding and border in the element's total width and height */
 }
@@ -110,6 +111,37 @@ Button.-dark-mode {
 
 .command-history-title.-dark-mode {
     color: #9E9E9E;
+}
+
+#weather_report_container {
+    border: solid grey;
+    height: 13;
+    width: 100%;
+    margin-top: 0;
+    padding: 0;
+    box-sizing: border-box;
+    display: none;
+}
+
+#weather_report_container.-dark-mode {
+    border: solid #424242;
+}
+
+.weather-report-title {
+    text-align: center;
+    text-style: bold;
+    color: gray;
+}
+
+.weather-report-title.-dark-mode {
+    color: #9E9E9E;
+}
+
+#weather_report_box {
+    height: 11;
+    width: 100%;
+    overflow: hidden;
+    content-align: center middle;
 }
 
 #command_history_box {

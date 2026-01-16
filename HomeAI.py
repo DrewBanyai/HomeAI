@@ -68,7 +68,7 @@ class HomeAI:
         
         #  Determine the command after the AI name in the full voice text, then pass it to our command execution function.
         queryString = queryCheck[1]
-        if (ExecuteCommand(queryString, self.AddSpeechString, self.Shutdown, self.SetAlarm) == False):
+        if (ExecuteCommand(queryString, self.AddSpeechString, self.Shutdown, self.SetAlarm, self.WeatherUpdateCallback) == False):
             log_debug_message("HomeAI", f"Unknown Query Detected: {queryString}")
             return
         
@@ -85,6 +85,10 @@ class HomeAI:
 
     def AddSpeechString(self, string):
         self.SpeechQueue.append(string)
+
+    def WeatherUpdateCallback(self, weather_data_json):
+        if self.ui:
+            self.ui.call_from_thread(self.ui.update_weather_report, weather_data_json)
 
     def Shutdown(self):
         log_debug_message("HomeAI", "Shutting down program...")

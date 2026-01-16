@@ -1,4 +1,5 @@
 import threading
+import json
 from textual.app import App, ComposeResult
 from textual.widgets import Header, Footer, Static, Button
 from textual.containers import Container, Horizontal
@@ -22,6 +23,7 @@ class TerminalUI(App):
         self.home_ai = home_ai_instance
         self.home_ai_thread = None
         self.conversation_history = []
+        self.weather_timer = None
         log_debug_message("TerminalUI", f"TerminalUI initialized. Initial self.dark={self.dark}")
 
     def compose(self) -> ComposeResult:
@@ -36,6 +38,11 @@ class TerminalUI(App):
                 Static("--- Conversation History ---", classes="command-history-title"),
                 Static(id="command_history_box"),
                 id="command_history_container"
+            ),
+            Container(
+                Static("Weather Report", classes="weather-report-title"),
+                Static(id="weather_report_box"),
+                id="weather_report_container"
             ),
             id="main_container"
         )
@@ -98,6 +105,78 @@ class TerminalUI(App):
         history_display = "\n".join(self.conversation_history)
         self.query_one("#command_history_box").update(history_display)
 
+    def generate_weather_item(self, code, high, low, day):
+        """Format a single weather icon with its temperatures and day name."""
+        from _env import WEATHER_ASCII
+        icon = WEATHER_ASCII.get(code, list(WEATHER_ASCII.values())[0])
+        lines = icon.split("\n")
+        
+        # Center the day name on the top border (index 0)
+        # The line is usually "==============" (14 chars)
+        day_text = day.center(12)
+        lines[0] = f"={day_text}="
+
+        # Format temperatures on the 9th line (index 8)
+        # The line is usually "=            ="
+        temp_text = f"H:{high} L:{low}"
+        # Center the temp text within the 12 characters between borders
+        padded_temp = temp_text.center(12)
+        lines[8] = f"={padded_temp}="
+        
+        return lines
+
+    def update_weather_report(self, weather_data_json: str = None):
+        """Generate and display weather reports from a JSON string."""
+        from _env import WEATHER_ASCII
+        import random
+
+        if weather_data_json:
+            try:
+                weather_data = json.loads(weather_data_json)
+            except Exception as e:
+                log_debug_message("TerminalUI", f"Error parsing weather JSON: {e}")
+                return
+        else:
+            # Fallback to random data if none provided (for initialization)
+            codes = list(WEATHER_ASCII.keys())
+            weather_data = []
+            for i in range(7):
+                code = random.choice(codes)
+                high = random.randint(30, 95)
+                low = random.randint(high - 20, high - 2)
+                weather_data.append({"code": code, "high": high, "low": low, "day": f"Day {i+1}"})
+        
+        all_items_lines = []
+        for item in weather_data:
+            code = item.get("code")
+            high = item.get("high")
+            low = item.get("low")
+            day = item.get("day", "Unknown")
+            all_items_lines.append(self.generate_weather_item(code, high, low, day))
+            
+        # Stitch lines horizontally
+        final_lines = []
+        for i in range(10):
+            # Join line 'i' of all items side-by-side with 2 spaces
+            combined_line = "  ".join(item[i] for item in all_items_lines)
+            final_lines.append(combined_line)
+            
+        report_display = "\n".join(final_lines)
+        self.query_one("#weather_report_box").update(report_display)
+        # Show the container now that we have data
+        self.query_one("#weather_report_container").display = True
+        
+        # Reset and start the 45-second auto-hide timer
+        if self.weather_timer:
+            self.weather_timer.cancel()
+        self.weather_timer = self.set_timer(45, self.hide_weather_report)
+
+    def hide_weather_report(self):
+        """Hide the weather report container."""
+        log_debug_message("TerminalUI", "Hiding weather report container.")
+        self.query_one("#weather_report_container").display = False
+        self.weather_timer = None
+
     async def on_mount(self) -> None:
         """Called when app is mounted."""
         # Ensure initial dark mode state is applied
@@ -106,6 +185,7 @@ class TerminalUI(App):
         log_debug_message("TerminalUI", f"on_mount called. self.dark={self.dark}")
         log_debug_message("TerminalUI", f"App classes on_mount: {self.classes}")
         self.home_ai.ui = self
+        
         self.home_ai_thread = threading.Thread(target=self.home_ai.run)
         self.home_ai_thread.start()
 

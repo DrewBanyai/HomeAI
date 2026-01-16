@@ -72,6 +72,7 @@ CommandAlternates = {
 
 PartialAlternates = {
     #  SET AN ALARM FOR
+    "set a timer for": "set an alarm for",
     "set an alarm for": "set an alarm for",
     "set alarm for": "set an alarm for",
     "set an alone for": "set an alarm for",

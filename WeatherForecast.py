@@ -1,5 +1,6 @@
 from _env import WEATHER_API_SEVEN_DAY_CALL, WEATHER_API_SINGLE_DAY_CALL, WEATHER_CODES
 import requests
+import json
 from datetime import datetime
 from Helper import log_debug_message
 
@@ -28,6 +29,7 @@ def GetSevenDayForecast():
         response = requests.get(api_call)
         response.raise_for_status()  # Raise an exception for bad status codes
         data = response.json()
+        log_debug_message("WeatherForecast", f"Report: {data}")
         weather = WeatherData(data)
         return weather
 
@@ -42,6 +44,7 @@ def GetSingleDayForecast():
         response = requests.get(api_call)
         response.raise_for_status()  # Raise an exception for bad status codes
         data = response.json()
+        log_debug_message("WeatherForecast", f"Report: {data}")
         weather = WeatherData(data)
         return weather
 
@@ -119,6 +122,29 @@ def SevenDayForecastString():
     except requests.exceptions.RequestException as e:
         log_debug_message("WeatherForecast", f"An error occurred: {e}")
         return "Sorry, an error occurred. Please try again later."
+
+def SevenDayForecastJSON():
+    try:
+        weather = GetSevenDayForecast()
+        
+        if weather.time and weather.temperature_2m_max and weather.temperature_2m_min and weather.weather_code:
+            weather_data = []
+            for i in range(len(weather.time)):
+                date_obj = datetime.fromisoformat(weather.time[i])
+                day_name = date_obj.strftime('%A')
+                weather_data.append({
+                    "code": weather.weather_code[i],
+                    "high": weather.temperature_2m_max[i],
+                    "low": weather.temperature_2m_min[i],
+                    "day": day_name
+                })
+            return json.dumps(weather_data)
+        else:
+            return None
+
+    except Exception as e:
+        log_debug_message("WeatherForecast", f"An error occurred in SevenDayForecastJSON: {e}")
+        return None
 
 def SingleDayForecastString():
     try:
