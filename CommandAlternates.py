@@ -64,6 +64,7 @@ CommandAlternates = {
     "weather forecasts today": "single day forecast",
     "what's the weather": "single day forecast",
     "what's the weather today": "single day forecast",
+    "what's today's weather": "single day forecast",
     "how's the weather today": "single day forecast",
     "give me the weather report for today": "single day forecast",
     "what's the weather": "single day forecast",
@@ -89,5 +90,6 @@ PartialAlternates = {
     "said no i am for": "set an alarm for",
     "an alarm for": "set an alarm for",
     "alarm for": "set an alarm for",
-    "sudden alarm for": "set an alarm for"
+    "sudden alarm for": "set an alarm for",
+    "said malone for ": "set an alarm for"
 }
