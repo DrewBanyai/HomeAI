@@ -1,23 +1,21 @@
 #  Import Offline Text to Speech through pyttsx3
 import pyttsx3
+from Helper import log_debug_message
 
 
 class TextToSpeech:
-    def __init__(self):
-        self.VoiceEngine = None
-        self.VoiceList = None
-        self.Initialize()
-
-    def Initialize(self):
-        self.VoiceEngine = pyttsx3.init()
-        self.VoiceList = self.VoiceEngine.getProperty("voices")
-        self.VoiceEngine.setProperty("voice", self.VoiceList[0].id)
-        self.VoiceEngine.setProperty("rate", 150)        
-
     def Speak(self, string):
-        if (self.VoiceEngine == None):
-            print("ERROR: Attempted to speak, but my voice engine is not properly loaded. Cancelling speech.")
-            return
-        
-        self.VoiceEngine.say(string)
-        self.VoiceEngine.runAndWait()
+        """
+        Initializes a new voice engine, speaks the given string, and shuts down.
+        This is a robust way to handle pyttsx3's state issues.
+        """
+        try:
+            engine = pyttsx3.init('sapi5')
+            voice_list = engine.getProperty("voices")
+            engine.setProperty("voice", voice_list[0].id)
+            engine.setProperty("rate", 150)
+            engine.say(string)
+            engine.runAndWait()
+            engine.stop()
+        except Exception as e:
+            log_debug_message("TextToSpeech", f"ERROR: An error occurred in the text-to-speech engine: {e}")

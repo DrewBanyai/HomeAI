@@ -1,5 +1,5 @@
 from threading import Timer
-from Helper import GetDateTime
+from Helper import GetDateTime, log_debug_message
 
 class Alarm:
     def __init__(self, alarmSetting, alarmTime):
@@ -8,7 +8,7 @@ class Alarm:
 
 class AlarmManager:
     def __init__(self, alarmCallback):
-        print("[Alarm Manager] initialized")
+        log_debug_message("AlarmManager", "[Alarm Manager] initialized")
         self.AlarmList = []
         self.AlarmCallback = alarmCallback
         self.Exit = False
@@ -25,5 +25,5 @@ class AlarmManager:
             Timer(1.0, self.AlarmCheck).start()
 
     def SetAlarm(self, alarmSetting, alarmTime):
-        print("SetAlarm", alarmTime)
+        log_debug_message("AlarmManager", f"SetAlarm: {alarmTime}")
         self.AlarmList.append(Alarm(alarmSetting, alarmTime))

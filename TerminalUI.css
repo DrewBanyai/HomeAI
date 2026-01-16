@@ -1,0 +1,106 @@
+#shutdown_button {
+    dock: top;
+    width: 20;
+    height: 3;
+    align: right top;
+    background: #FF5252;
+    color: white;
+    text-style: bold;
+    content-align: center middle;
+    margin-right: 2;
+}
+
+Screen {
+    align: center middle;
+    background: #000000;
+    /* Default: Dark */
+    color: #FFFFFF;
+}
+
+Screen.-light-mode {
+    background: #FFFFFF;
+    /* Light toggle */
+    color: #000000;
+}
+
+Static {
+    background: #111111;
+    color: #EEEEEE;
+}
+
+Screen.-light-mode Static,
+.-light-mode Static {
+    background: #E3F2FD;
+    color: #000000;
+}
+
+Header {
+    background: #111111;
+    color: #FFFFFF;
+}
+
+Footer {
+    background: #111111;
+    color: #FFFFFF;
+}
+
+#main_container {
+    height: 100%;
+    width: 100%;
+    padding: 1 2;
+}
+
+Button {
+    background: blue;
+    color: white;
+}
+
+Button.-dark-mode {
+    background: #424242;
+    /* Darker grey */
+    color: #EEEEEE;
+    border: solid #616161;
+}
+
+#status {
+    margin: 1 0 0 0;
+}
+
+#currently_playing {
+    margin: 1 0 0 0;
+    margin-bottom: 1;
+    /* Add some space below currently playing */
+}
+
+#command_history_container {
+    border: solid grey;
+    height: 9;
+    /* 6 lines for history + 1 for title + 2 for borders */
+    width: 100%;
+    margin-top: 1;
+    padding: 0 1;
+    box-sizing: border-box;
+    /* Include padding and border in the element's total width and height */
+}
+
+#command_history_container.-dark-mode {
+    border: solid #424242;
+}
+
+.command-history-title {
+    text-align: center;
+    text-style: bold;
+    color: gray;
+}
+
+.command-history-title.-dark-mode {
+    color: #9E9E9E;
+}
+
+#command_history_box {
+    height: 6;
+    /* Fixed height for 6 lines of text */
+    width: 100%;
+    overflow: hidden;
+    /* Hide overflow if text exceeds height */
+}

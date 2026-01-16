@@ -59,6 +59,7 @@ CommandAlternates = {
     "what's the seven day forecast": "seven day forecast",
 
     #  SINGLE DAY FORECAST
+    "single day forecasts": "single day forecast",
     "weather forecast today": "single day forecast",
     "weather forecasts today": "single day forecast",
     "what's the weather": "single day forecast",

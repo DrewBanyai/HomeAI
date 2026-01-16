@@ -1,6 +1,7 @@
 from _env import WEATHER_API_SEVEN_DAY_CALL, WEATHER_API_SINGLE_DAY_CALL, WEATHER_CODES
 import requests
 from datetime import datetime
+from Helper import log_debug_message
 
 class WeatherData:
     def __init__(self, api_data):
@@ -21,7 +22,7 @@ class WeatherData:
 
 def GetSevenDayForecast():
     api_call = WEATHER_API_SEVEN_DAY_CALL
-    print("Fetching the seven day forecast from [api.open-meteo.com]")
+    log_debug_message("WeatherForecast", "Fetching the seven day forecast from [api.open-meteo.com]")
 
     try:
         response = requests.get(api_call)
@@ -31,11 +32,11 @@ def GetSevenDayForecast():
         return weather
 
     except requests.exceptions.RequestException as e:
-        print(f"An error occurred: {e}")
+        log_debug_message("WeatherForecast", f"An error occurred: {e}")
 
 def GetSingleDayForecast():
     api_call = WEATHER_API_SINGLE_DAY_CALL
-    print("Fetching the daily forecast for today from [api.open-meteo.com]")
+    log_debug_message("WeatherForecast", "Fetching the daily forecast for today from [api.open-meteo.com]")
 
     try:
         response = requests.get(api_call)
@@ -45,7 +46,7 @@ def GetSingleDayForecast():
         return weather
 
     except requests.exceptions.RequestException as e:
-        print(f"An error occurred: {e}")
+        log_debug_message("WeatherForecast", f"An error occurred: {e}")
 
 def PrintSevenDayForecast():
     try:
@@ -54,13 +55,13 @@ def PrintSevenDayForecast():
         
         print("\nDaily Weather Forecast:")
         if weather.time and weather.temperature_2m_max and weather.temperature_2m_min and weather.weather_code:
-            print(f"{'Day':<12} {'Temp (Max)':<15} {'Temp (Min)':<15} {'Weather':<25}")
-            print("-" * 79)
+            log_debug_message("WeatherForecast", f"{'Day':<12} {'Temp (Max)':<15} {'Temp (Min)':<15} {'Weather':<25}")
+            log_debug_message("WeatherForecast", "-" * 79)
             for i in range(len(weather.time)):
                 date_obj = datetime.fromisoformat(weather.time[i])
                 day_of_week = date_obj.strftime('%A')
                 code_description = weather_code_map.get(weather.weather_code[i], f"Unknown ({weather.weather_code[i]})")
-                print(
+                log_debug_message("WeatherForecast", 
                     f"{day_of_week:<12} "
                     f"{weather.temperature_2m_max[i]:<15} "
                     f"{weather.temperature_2m_min[i]:<15} "
@@ -68,25 +69,25 @@ def PrintSevenDayForecast():
                 )
             print("\n")
         else:
-            print("  Daily weather data not available.")
+            log_debug_message("WeatherForecast", "  Daily weather data not available.")
 
     except requests.exceptions.RequestException as e:
-        print(f"An error occurred: {e}")
+        log_debug_message("WeatherForecast", f"An error occurred: {e}")
 
 def PrintSingleDayForecast():
     try:
         weather_code_map = WEATHER_CODES
         weather = GetSingleDayForecast()
         
-        print("\nDaily Weather Forecast:")
+        log_debug_message("WeatherForecast", "\nDaily Weather Forecast:")
         if weather.time and weather.temperature_2m_max and weather.temperature_2m_min and weather.weather_code:
-            print(f"{'Day':<12} {'Temp (Max)':<15} {'Temp (Min)':<15} {'Weather':<25}")
-            print("-" * 79)
+            log_debug_message("WeatherForecast", f"{'Day':<12} {'Temp (Max)':<15} {'Temp (Min)':<15} {'Weather':<25}")
+            log_debug_message("WeatherForecast", "-" * 79)
             for i in range(len(weather.time)):
                 date_obj = datetime.fromisoformat(weather.time[i])
                 day_of_week = date_obj.strftime('%A')
                 code_description = weather_code_map.get(weather.weather_code[i], f"Unknown ({weather.weather_code[i]})")
-                print(
+                log_debug_message("WeatherForecast", 
                     f"{day_of_week:<12} "
                     f"{weather.temperature_2m_max[i]:<15} "
                     f"{weather.temperature_2m_min[i]:<15} "
@@ -94,10 +95,10 @@ def PrintSingleDayForecast():
                 )
             print("\n")
         else:
-            print("  Daily weather data not available.")
+            log_debug_message("WeatherForecast", "  Daily weather data not available.")
 
     except requests.exceptions.RequestException as e:
-        print(f"An error occurred: {e}")
+        log_debug_message("WeatherForecast", f"An error occurred: {e}")
 
 def SevenDayForecastString():
     try:
@@ -116,7 +117,7 @@ def SevenDayForecastString():
             return "Sorry, the seven day forecast was not available. Please try again later."
 
     except requests.exceptions.RequestException as e:
-        print(f"An error occurred: {e}")
+        log_debug_message("WeatherForecast", f"An error occurred: {e}")
         return "Sorry, an error occurred. Please try again later."
 
 def SingleDayForecastString():
@@ -136,13 +137,13 @@ def SingleDayForecastString():
             return "Sorry, the daily forecast was not available. Please try again later."
 
     except requests.exceptions.RequestException as e:
-        print(f"An error occurred: {e}")
+        log_debug_message("WeatherForecast", f"An error occurred: {e}")
         return "Sorry, an error occurred. Please try again later."
 
 if __name__ == "__main__":
     PrintSevenDayForecast()
     seven_day_forecast = SevenDayForecastString()
-    print(seven_day_forecast)
+    log_debug_message("WeatherForecast", seven_day_forecast)
     PrintSingleDayForecast()
     single_day_forecast = SingleDayForecastString()
-    print(single_day_forecast)
+    log_debug_message("WeatherForecast", single_day_forecast)

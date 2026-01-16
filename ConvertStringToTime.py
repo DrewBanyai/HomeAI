@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from Helper import log_debug_message
 
 from Pronunciation import PRONUNCIATION_WORDS_TO_NUMBERS
 
@@ -67,7 +68,7 @@ class ConvertStringToTime:
                         hour_numbers.append(string_parts[i])
                     for x in hour_numbers:
                         hours += PRONUNCIATION_WORDS_TO_NUMBERS[x]
-                    print("Hours: " + str(hours))
+                    log_debug_message("ConvertStringToTime", "Hours: " + str(hours))
 
                 # Determine the number of minutes
                 minutes = 0
@@ -83,7 +84,7 @@ class ConvertStringToTime:
                         minute_numbers.append(string_parts[i])
                     for x in minute_numbers:
                         minutes += PRONUNCIATION_WORDS_TO_NUMBERS[x]
-                    print("Minutes: " + str(minutes))
+                    log_debug_message("ConvertStringToTime", "Minutes: " + str(minutes))
 
                 # Determine the number of minutes
                 seconds = 0
@@ -97,7 +98,7 @@ class ConvertStringToTime:
                         second_numbers.append(string_parts[i])
                     for x in second_numbers:
                         seconds += PRONUNCIATION_WORDS_TO_NUMBERS[x]
-                    print("Seconds: " + str(seconds))
+                    log_debug_message("ConvertStringToTime", "Seconds: " + str(seconds))
 
                 self.DateTime = self.GetDateTimeFromDelta(h=hours, m=minutes, s=seconds)
                 self.DeltaTime = self.DateTime - datetime.now()
@@ -106,7 +107,7 @@ class ConvertStringToTime:
             self.Error = "Unknown failure occurred. Failed to convert string to time."
             return
         except Exception as e:
-            print(e)
+            log_debug_message("ConvertStringToTime", str(e))
             self.Error = "Unknown error occurred. Failed to convert string to time."
             return
         

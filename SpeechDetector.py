@@ -6,9 +6,9 @@ import os
 import speech_recognition as sr
 
 #  Import Vosk module
-from vosk import Model, KaldiRecognizer
+from vosk import SetLogLevel, Model, KaldiRecognizer
 
-from Helper import IsJSON
+from Helper import IsJSON, log_debug_message
 
 
 class SpeechDetector:
@@ -37,21 +37,23 @@ class SpeechDetector:
             return False
 
     def ProcessAudioInThread(self, recognizer, audio):
-        print("Detected voice audio. Attempting to process audio into text...")
+        log_debug_message("SpeechDetector", "Detected voice audio. Attempting to process audio into text...")
         
         processThread = threading.Thread(target=self.ProcessAudio, args=(recognizer, audio))
         processThread.start()
 
     def ProcessAudio(self, recognizer, audio):
         if (self.QueryCallback == None):
-            print("ERROR: Received audio to process, but there is no query callback to call with the data if we recognized it.")
+            log_debug_message("SpeechDetector", "ERROR: Received audio to process, but there is no query callback to call with the data if we recognized it.")
             return
         
         if (audio == None):
-            print("ERROR: Received audio to process, but the audio received is empty data.")
+            log_debug_message("SpeechDetector", "ERROR: Received audio to process, but the audio received is empty data.")
             return
         
         try:
+            SetLogLevel(-1)
+
             # Create vosk model and recognizer
             vosk_model = Model(os.path.join(os.getcwd(), "model"))
             vosk_recognizer = KaldiRecognizer(vosk_model, audio.sample_rate)
@@ -66,10 +68,10 @@ class SpeechDetector:
             resultDict = json.loads(result_json)
             query = resultDict["text"].lower()
 
-            print("USER QUERY: \"" + query + "\"")
+            #print("USER QUERY: \"" + query + "\"")
             if (self.QueryCallback != None and len(query) > 0):
                 self.QueryCallback(query)
                 self.Microphone = sr.Microphone(0)
         except Exception as e:
-            print("ERROR: Failed to process user voice query. Returning to Listening mode")
-            print(e)
+            log_debug_message("SpeechDetector", "ERROR: Failed to process user voice query. Returning to Listening mode")
+            log_debug_message("SpeechDetector", str(e))

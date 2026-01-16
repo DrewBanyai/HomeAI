@@ -7,11 +7,23 @@ from email.message import EmailMessage
 import requests
 from playsound3 import *
 
-from CommandAlternates import AINameAlternates
 from Pronunciation import *
-from ConvertStringToTime import ConvertStringToTime
 
 from _env import NEWS_API_KEY, GMAIL_EMAIL, GMAIL_APP_PASSWORD, AI_NAME, COIN_API_KEY, CRYPTO_ASSET_PAIRS
+
+LOG_FILE_PATH = "debug_log.txt"
+
+def log_debug_message(source: str, message: str):
+    """Writes a timestamped debug message with a source identifier to a log file."""
+    timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    formatted_message = f"[{timestamp}] [{source}]: {message}"
+    with open(LOG_FILE_PATH, "a") as f:
+        f.write(formatted_message + "\n")
+
+def clear_debug_log():
+    """Clears the debug log file by opening it in write mode and closing it."""
+    with open(LOG_FILE_PATH, "w") as f:
+        pass
 
 
 def GetDateTime():
@@ -24,25 +36,7 @@ def TellMeTheTime(speechCallback):
         timeStatement = "The time is " + GetTimeNaturalEnglish(currentTime)
         speechCallback(timeStatement)
     except Exception as e:
-        print(e)
-
-
-def StringBeginsWithAIName(string):
-    if IsAINameDefined() == False:
-        return False
-    
-    firstSpace = string.find(" ")
-    if (firstSpace == -1):
-        return (False, "")
-    
-    for alt in AINameAlternates:
-        nameLength = len(alt + " ")
-        if (string[0:nameLength].lower() == (alt + " ").lower()):
-            return (True, string[nameLength:len(string)])
-    
-    if (string[0:nameLength].lower() == (AI_NAME + " ").lower()):
-        return (True, string[nameLength:len(string)])
-    return (False, "")
+        log_debug_message("Helper", str(e))
 
 
 def GeneralTimeOfDay():
@@ -53,23 +47,20 @@ def GeneralTimeOfDay():
         return "Afternoon"
     else:
         return "Evening"
-    
-def StringToTime(string):
-    return ConvertStringToTime(string)
 
 def ConvertHourTo24Hour(hour, ap):
     return hour - (12 if (hour == 12) else 0) + (0 if (ap == "am") else 12)
 
 
 def ChangeTime(dt, hour, minute, second, microsecond):
-    print("test")
+    log_debug_message("Helper", "ChangeTime: test")
 
 
 def IsAINameDefined():
     try:
         AI_NAME
     except NameError:
-        print("No AI_NAME provided. Please provide this in the User Defined Data section above.")
+        log_debug_message("Helper", "No AI_NAME provided. Please provide this in the User Defined Data section above.")
         return False
     return True
 
@@ -106,10 +97,10 @@ def IsNewsApiKeyDefined():
     try:
         NEWS_API_KEY
     except NameError:
-        print("No NEWS_API_KEY provided. Please provide this in the User Defined Data section above. You can acquire a key for free at https://newsapi.org/\n")
+        log_debug_message("Helper", "No NEWS_API_KEY provided. Please provide this in the User Defined Data section above. You can acquire a key for free at https://newsapi.org/\n")
         return False
     if NEWS_API_KEY == None:
-        print("No NEWS_API_KEY provided. Please provide this in the User Defined Data section above. You can acquire a key for free at https://newsapi.org/\n")
+        log_debug_message("Helper", "No NEWS_API_KEY provided. Please provide this in the User Defined Data section above. You can acquire a key for free at https://newsapi.org/\n")
         return False
     return True
 
@@ -117,10 +108,10 @@ def IsCoinApiKeyDefined():
     try:
         COIN_API_KEY
     except NameError:
-        print("No COIN_API_KEY provided. Please provide this in the User Defined Data section above. You can acquire a key for free at https://www.coinapi.io/\n")
+        log_debug_message("Helper", "No COIN_API_KEY provided. Please provide this in the User Defined Data section above. You can acquire a key for free at https://www.coinapi.io/\n")
         return False
     if COIN_API_KEY == None:
-        print("No COIN_API_KEY provided. Please provide this in the User Defined Data section above. You can acquire a key for free at https://www.coinapi.io/\n")
+        log_debug_message("Helper", "No COIN_API_KEY provided. Please provide this in the User Defined Data section above. You can acquire a key for free at https://www.coinapi.io/\n")
         return False
     return True
 
@@ -129,7 +120,7 @@ def AreCryptoPairsDefined():
         CRYPTO_ASSET_PAIRS
         CRYPTO_ASSET_PAIRS[0]
     except Exception:
-        print("No CRYPTO_ASSET_PAIRS provided. Please provide this in the User Defined Data section above. Value should be an array of tuples, where each tuple is like so: (\"BTC\", \"USD\", 1) where the third value is the number of decimal places to round the price to\n")
+        log_debug_message("Helper", "No CRYPTO_ASSET_PAIRS provided. Please provide this in the User Defined Data section above. Value should be an array of tuples, where each tuple is like so: (\"BTC\", \"USD\", 1) where the third value is the number of decimal places to round the price to\n")
         return False
     return True
 
@@ -186,11 +177,11 @@ def GetCryptoPrices_old(speechCallback):
             for entry in priceDataJson["result"]:
                 if (entry["altname"].lower() == asset):
                     speechCallback("Current Price for asset " + asset + " is ")
-        print(priceDataJson)
+        log_debug_message("Helper", str(priceDataJson))
         speechCallback("Crypto price data acquired from " + PRONUNCIATION_KRAKEN_DOT_COM)
     except Exception as e:
-        print("GET CRYPTO PRICES ERROR")
-        print(e)
+        log_debug_message("Helper", "GET CRYPTO PRICES ERROR")
+        log_debug_message("Helper", str(e))
 
 
 def IsGmailLoginDefined():
@@ -198,10 +189,10 @@ def IsGmailLoginDefined():
         GMAIL_EMAIL
         GMAIL_APP_PASSWORD
     except Exception as e:
-        print("No GMAIL_LOGIN or GMAIL_APP_PASSWORD data provided. Please provide this in the User Defined Data section above. You can acquire an account for free at https://mail.google.com/\n")
+        log_debug_message("Helper", "No GMAIL_LOGIN or GMAIL_APP_PASSWORD data provided. Please provide this in the User Defined Data section above. You can acquire an account for free at https://mail.google.com/\n")
         return False
     if ((GMAIL_EMAIL == None) or (GMAIL_APP_PASSWORD == None)):
-        print("No GMAIL_LOGIN or GMAIL_APP_PASSWORD data provided. Please provide this in the User Defined Data section above. You can acquire an account for free at https://mail.google.com/\n")
+        log_debug_message("Helper", "No GMAIL_LOGIN or GMAIL_APP_PASSWORD data provided. Please provide this in the User Defined Data section above. You can acquire an account for free at https://mail.google.com/\n")
         return False
     return True
 
@@ -223,8 +214,8 @@ def SendTestEmail(sendTo, subject, messageText):
         server.send_message(msg)
         server.quit()
     except Exception as e:
-        print("EMAIL SEND EXCEPTION")
-        print(e)
+        log_debug_message("Helper", "EMAIL SEND EXCEPTION")
+        log_debug_message("Helper", str(e))
 
 def Sleep(seconds):
     time.sleep(seconds)

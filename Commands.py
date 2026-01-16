@@ -1,18 +1,19 @@
-from Helper import GetAIName, TellMeTheTime, StringToTime, GetNewsTopHeadlines, SendTestEmail, GetCryptoPrices, IsGmailLoginDefined
+from Helper import GetAIName, TellMeTheTime, GetNewsTopHeadlines, SendTestEmail, GetCryptoPrices, IsGmailLoginDefined, log_debug_message
 from _env import GMAIL_EMAIL
 from CommandAlternates import CommandAlternates, PartialAlternates
 from WeatherForecast import SevenDayForecastString, SingleDayForecastString
+from ConvertStringToTime import ConvertStringToTime
 
 class CommandCallback:
     def __init__(self, callbackType, callback):
-        print("Command Callback __init__")
+        log_debug_message("Commands", "Command Callback __init__")
 
 def ExecuteCommand(command, speechCallback, shutdownCallback, alarmCallback):
-    print("Execute command: [" + command + "]")
+    log_debug_message("Commands", "Execute command: [" + command + "]")
     
     #  If we use an alternate command, switch over to the official command string
     if (command in CommandAlternates):
-        print("Switching command: [" + command + "] > [" + CommandAlternates[command] + "]")
+        log_debug_message("Commands", "Switching command: [" + command + "] > [" + CommandAlternates[command] + "]")
         command = CommandAlternates[command]
 
     #  Check for "partial commands" first, commands which begin with a command trigger term and then include details
@@ -20,15 +21,15 @@ def ExecuteCommand(command, speechCallback, shutdownCallback, alarmCallback):
     if (partialCheck and partialCheck[0] == True):
         partialCommand = partialCheck[1]
         partialDetails = partialCheck[2]
-        print("Partial Command detected and parsed! Command [" + partialCommand + "], Details: [" + partialDetails + "]")
+        log_debug_message("Commands", "Partial Command detected and parsed! Command [" + partialCommand + "], Details: [" + partialDetails + "]")
 
         if (partialCommand == "set an alarm for"):
-            timeConvert = StringToTime(partialDetails)
+            timeConvert = ConvertStringToTime(partialDetails)
             if (timeConvert.Error != None):
-                print("Time Conversion Error: " + timeConvert.Error)
+                log_debug_message("Commands", "Time Conversion Error: " + timeConvert.Error)
                 return False
             else:
-                print("Time Convert complete:", timeConvert.DateTime)
+                log_debug_message("Commands", f"Time Convert complete: {timeConvert.DateTime}")
                 alarmCallback(timeConvert.TimeSetting, timeConvert.DateTime)
                 return True
 
@@ -84,6 +85,6 @@ def PartialCommandCheck(command, speechCallback, shutdownCallback):
                 command = PartialAlternates[alt]
                 return (True, command, details)
     except Exception as e:
-        print("PartialCommand exception")
-        print(e)
+        log_debug_message("Commands", "PartialCommand exception")
+        log_debug_message("Commands", str(e))
     return (False, None, None)
