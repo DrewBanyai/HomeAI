@@ -1,13 +1,29 @@
-#shutdown_button {
+#custom_header {
     dock: top;
-    width: 20;
-    height: 3;
-    align: right top;
+    height: 1;
+    background: #111111;
+    color: #FFFFFF;
+    width: 100%;
+}
+
+#close_button {
+    width: 3;
+    height: 1;
     background: #FF5252;
     color: white;
     text-style: bold;
+    border: none;
     content-align: center middle;
-    margin-right: 2;
+    margin: 0;
+    padding: 0;
+    min-width: 3;
+}
+
+#header_title {
+    width: 1fr;
+    content-align: center middle;
+    text-style: bold;
+    height: 1;
 }
 
 Screen {
@@ -34,9 +50,8 @@ Screen.-light-mode Static,
     color: #000000;
 }
 
-Header {
-    background: #111111;
-    color: #FFFFFF;
+#custom_header Static {
+    background: transparent;
 }
 
 Footer {

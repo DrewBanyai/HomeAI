@@ -1,13 +1,14 @@
 import threading
 from textual.app import App, ComposeResult
 from textual.widgets import Header, Footer, Static, Button
-from textual.containers import Container
+from textual.containers import Container, Horizontal
 from textual.reactive import reactive
 from Helper import log_debug_message
 
 class TerminalUI(App):
     """A Textual app to manage HomeAI."""
 
+    TITLE = "HomeAI"
     CSS_PATH = "TerminalUI.css"
 
     BINDINGS = [("d", "toggle_dark", "Toggle dark mode")]
@@ -25,8 +26,9 @@ class TerminalUI(App):
 
     def compose(self) -> ComposeResult:
         """Create child widgets for the app."""
-        yield Header()
-        yield Button("Shutdown", id="shutdown_button", variant="error")
+        with Horizontal(id="custom_header"):
+            yield Button("X", id="close_button", variant="error")
+            yield Static(self.TITLE, id="header_title")
         yield Container(
             Static("Status: Initializing...", id="status"),
             Static("Currently Playing: None", id="currently_playing"),
@@ -58,8 +60,8 @@ class TerminalUI(App):
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
         """Event handler called when a button is pressed."""
-        if event.button.id == "shutdown_button":
-            log_debug_message("TerminalUI", "Shutdown button pressed. Exiting application.")
+        if event.button.id in ["shutdown_button", "close_button"]:
+            log_debug_message("TerminalUI", f"{event.button.id} pressed. Exiting application.")
             self.exit()
 
     def action_toggle_dark(self) -> None:
