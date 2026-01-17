@@ -1,6 +1,6 @@
 #########
 __author__ = "Drew Banyai <DrewBanyai@gmail.com>"
-__version__ = "v0.02"
+__version__ = "v0.03"
 #########
 
 #  If we've passed in an argument, use the first argument to set the current working directory
