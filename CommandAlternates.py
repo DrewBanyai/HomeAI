@@ -13,6 +13,7 @@ CommandAlternates = {
     "listening test": "can you hear me",
 
     #  WHAT TIME IS IT
+    "we're time is it": "what time is it",
     "what time is it right now": "what time is it",
     "what the time": "what time is it",
     "what the time right now": "what time is it",

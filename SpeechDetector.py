@@ -17,6 +17,8 @@ class SpeechDetector:
         self.Microphone = None
         self.QueryCallback = None
         self.Exit = False
+        self.ListeningPaused = False
+        self.StopListening = None
         self.Initialize()
 
     def Initialize(self):
@@ -43,6 +45,9 @@ class SpeechDetector:
         processThread.start()
 
     def ProcessAudio(self, recognizer, audio):
+        if (self.ListeningPaused == True):
+            return
+
         if (self.QueryCallback == None):
             log_debug_message("SpeechDetector", "ERROR: Received audio to process, but there is no query callback to call with the data if we recognized it.")
             return

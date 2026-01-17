@@ -3,6 +3,9 @@ __author__ = "Drew Banyai <DrewBanyai@gmail.com>"
 __version__ = "v0.03"
 #########
 
+# Environment variables
+from _env import GREET_USER_ON_STARTUP
+
 #  If we've passed in an argument, use the first argument to set the current working directory
 import sys
 import os
@@ -35,11 +38,15 @@ def StringBeginsWithAIName(string):
     
     for alt in AINameAlternates:
         nameLength = len(alt + " ")
-        if (string[0:nameLength].lower() == (alt + " ").lower()):
-            return (True, string[nameLength:len(string)])
     
-    if (string[0:nameLength].lower() == (AI_NAME + " ").lower()):
-        return (True, string[nameLength:len(string)])
+        # Search for the first instance of the name. It is possible that other words could be picked up prior and we should ignore anything before the wake word.
+        nameIndex = string.find(alt)
+        if (nameIndex == -1):
+            continue
+    
+        if (string[nameIndex:nameIndex+nameLength].lower() == (alt + " ").lower()):
+            return (True, string[nameIndex+nameLength:len(string)])
+    
     return (False, "")
 
 
@@ -48,7 +55,6 @@ class HomeAI:
     def __init__(self):
         self.TextToSpeech = None
         self.SpeechDetector = None
-        self.Listening = False
         self.Exit = False
         self.SpeechQueue = []
         self.AlarmManager = None
@@ -80,7 +86,7 @@ class HomeAI:
         if (len(self.SpeechQueue) == 0):
             if self.ui:
                 self.ui.call_from_thread(self.ui.update_status, "Listening...")
-            log_debug_message("HomeAI", "Thinking complete. Returning to Listening mode.")
+            log_debug_message("HomeAI", "Thinking complete. Listening...")
 
 
     def AddSpeechString(self, string):
@@ -100,25 +106,31 @@ class HomeAI:
 
     def Initialize(self):
         if self.ui:
-            self.ui.call_from_thread(self.ui.update_status, "Initializing...")
+            self.ui.call_from_thread(self.ui.update_status, "Initializing HomeAI...")
+        log_debug_message("Initialize", "Initializing HomeAI...")
 
         if self.ui:
             self.ui.call_from_thread(self.ui.update_status, "Loading Alarm Manager system...")
+        log_debug_message("Initialize", "Loading Alarm Manager system...")
         self.AlarmManager = AlarmManager(self.AddSpeechString)
 
         if self.ui:
             self.ui.call_from_thread(self.ui.update_status, "Loading Text to Speech generation system...")
+        log_debug_message("Initialize", "Loading Text to Speech generation system...")
         self.TextToSpeech = TextToSpeech()
 
         if self.ui:
             self.ui.call_from_thread(self.ui.update_status, "Loading speech recognition system...")
+        log_debug_message("Initialize", "Loading speech recognition system...")
         self.SpeechDetector = SpeechDetector()
+        self.SpeechDetector.BeginListening(self.Respond)
 
         if self.ui:
-            self.ui.call_from_thread(self.ui.update_status, "Initialization Complete")
+            self.ui.call_from_thread(self.ui.update_status, "Initialization Complete. Listening... ")
+        log_debug_message("Initialize", "Initialization Complete. Listening... ")
 
-        #print("Greeting user...")
-        #self.TextToSpeech.Speak(GeneralGreeting())
+        if GREET_USER_ON_STARTUP == True:
+            self.TextToSpeech.Speak(GeneralGreeting())
 
 
     def run(self):
@@ -130,29 +142,34 @@ class HomeAI:
     def MainLoop(self):
         while self.Exit == False:
             if (len(self.SpeechQueue) > 0):
-                self.Listening = False
+                log_debug_message("MainLoop", f"Detected {len(self.SpeechQueue)} items in speech queue.")
                 if self.ui:
                     self.ui.call_from_thread(self.ui.update_status, "Speaking...")
-                self.SpeechDetector.StopListening(True)
+                log_debug_message("MainLoop", "Speaking...")
+
+                #self.SpeechDetector.StopListening(True)
+                self.SpeechDetector.ListeningPaused = True
+
                 while (len(self.SpeechQueue) > 0):
                     text = self.SpeechQueue.pop(0)
 
                     # Add the response to the conversation history in the UI
                     if self.ui:
                         self.ui.call_from_thread(self.ui.add_line_to_history, "RESPONSE: ", text)
-                        
-                        log_debug_message("HomeAI", f"SPEECH: {text}")
+                    log_debug_message("MainLoop", f"RESPONSE: {text}")
+
                     self.TextToSpeech.Speak(text)
+                log_debug_message("MainLoop", "Cleared the speech queue. Returning to listening mode...")
             
-            if (self.Listening == False):
-                self.Listening = True
-                if self.SpeechDetector.BeginListening(self.Respond) == False:
-                    log_debug_message("HomeAI", "Failed to begin listening. Please ensure you have a working microphone installed on this device.")
-                    self.Exit = True
-                else:
-                    if self.ui:
-                        self.ui.call_from_thread(self.ui.update_status, "Listening...")
-                    log_debug_message("HomeAI", "Returning to Listening mode.")
+            if (self.SpeechDetector.ListeningPaused == True):
+                #if self.SpeechDetector.BeginListening(self.Respond) == False:
+                #    log_debug_message("MainLoop", "Failed to begin listening. Please ensure you have a working microphone installed on this device.")
+                #    self.Exit = True
+                #else:
+                self.SpeechDetector.ListeningPaused = False
+                if self.ui:
+                    self.ui.call_from_thread(self.ui.update_status, "Listening...")
+                log_debug_message("MainLoop", "Listening...")
 
         self.AlarmManager.Exit = True
         self.SpeechDetector.StopListening(True)

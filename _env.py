@@ -1,3 +1,6 @@
+# GENERAL SETTINGS
+GREET_USER_ON_STARTUP = False
+
 #  NEWS_API_KEY should be a string of your NewsApi.org API key. You can acquire a key for free at https://newsapi.org/
 NEWS_API_KEY = None
 
