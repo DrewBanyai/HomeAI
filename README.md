@@ -1,28 +1,77 @@
+# HomeAI: Your Offline Personal Assistant
+
 ![](Cover.png)
 
-# HomeAI
-A python-based offline AI assistant program, built to replace Alexa for daily tasks
+HomeAI is a Python-based, privacy-focused offline AI assistant designed to handle daily tasks and provide information without relying on cloud-based smart speakers. It features a custom terminal interface, voice recognition, and text-to-speech capabilities.
 
-## Issuing Queries
-All queries are initiated with a query string and should begin with referring to the AI by name. By default, it's name is "Frank", so a query like "Can you hear me" would be issued by saying "Frank. Can you hear me?"
+---
 
-### Known Query Strings
-* **"Can you hear me"** - Will answer with an affirmative if the program is online and listening properly
-* **"What time is it"** - Will answer with the current time. By default, this is in Eastern Standard Time, but you can change this setting in code
-* **"Set an alarm for XXX"** - Will allow you to set an alarm for a certain time. You must describe a full time, including AM or PM. For example: "Set an alarm for seven fifteen pm"
-* **"Give me the headlines"** - Will answer with the top headlines from the Associated Press news feed (if Open News API key is provided in _env.py)
-* **"Get crypto prices"** - Will give the current exchange rates between asset pairs (if a list of CRYPTO_ASSET_PAIRS and a COIN_API_KEY has been provided in _env.py)
-* **"Send a test email"** - Will send an email from your GMAIL_EMAIL to your GMAIL_EMAIL with a test subject and message. You may customize this as you wish.
-* **"Shut down"** - Will shut down the program
+## 🚀 Getting Started
 
-### Command Alternates
-A number of commands have common mistranslations, so this project includes a number of command alternates in CommandAlternates.py which map back to the actual command. You may add more as needed. This file also includes AI name alternates, so if you change the AI name, you may want to add some alternate values for that as well.
+### Prerequisites
+Before running HomeAI, ensure you have Python installed. You will also need a working microphone and speakers.
 
-### Initial Setup
-If you'd like the full functionality of the bot, you'll need to sign up for a few free services and put some information into the _env.py file.
-- For the news headlines, you'll need to sign up for a free API key at https://newsapi.org/
-- For the ability to send an email, you'll need a Gmail account you can access and in the settings for it, you'll need to generate an API Password and supply both in _env.py
-- For cryptocurrency prices, you'll need to sign up for a free API key at https://www.coinapi.io/
-    - Note: This is not the same as signing up for a full account and then selecting the free tier. Just go to the main page and select free without an account to generate a key.
-- You'll want to assign any crypto pairs you want to check the price of. For starters, I've put in BTC->USD but you can put in whatever you'd like. I've included a few commented out to try.
-- If you want to refer to your HomeAI instance by a name other than "Frank", you can set that in _env.py, but you should also alter the AINameAlternates list in CommandAlternates.py
+### Initial Installation
+1. Clone the repository to your local machine.
+2. Install the required dependencies using pip:
+   ```bash
+   pip install -r Requirements.txt
+   ```
+
+### Configuration (`_env.py`)
+To enable full functionality, you must configure the `_env.py` file with your preferences and API keys:
+
+- **AI Name**: Change `AI_NAME` (default is "Frank") to your preferred wake word.
+- **News**: Get a free API key from [newsapi.org](https://newsapi.org/) and set `NEWS_API_KEY`.
+- **Crypto**: Get a free API key from [coinapi.io](https://www.coinapi.io/) and set `COIN_API_KEY`. Define your pairs in `CRYPTO_ASSET_PAIRS`.
+- **Email**: To use the email feature, provide your Gmail address and an [App Password](https://myaccount.google.com/apppasswords) in `GMAIL_EMAIL` and `GMAIL_APP_PASSWORD`.
+- **Weather**: Update the `WEATHER_API` URLs with your local latitude and longitude coordinates.
+
+---
+
+## 🗣️ How to Interact
+
+HomeAI listens for its name (the wake word) followed by a command.
+
+**Example:**
+> *"Frank, what time is it?"*
+
+### The UI
+When you run `HomeAI.py`, a terminal-based UI will launch, showing:
+- **Status**: Current state (Listening, Thinking, Speaking).
+- **History**: A log of your commands and the AI's responses.
+- **Weather**: A visual ASCII forecast (if weather commands are used).
+
+---
+
+## 📋 Available Commands
+
+| Command Category | Primary Command | Description |
+| :--- | :--- | :--- |
+| **System** | "Can you hear me" | Verifies the AI is active and listening. |
+| **Time** | "What time is it" | Tells the current local time. |
+| **News** | "Give me the headlines" | Reads the top headlines from the Associated Press. |
+| **Crypto** | "Get crypto prices" | Provides exchange rates for your configured asset pairs. |
+| **Email** | "Send a test email" | Sends a test message to your configured Gmail account. |
+| **Alarms** | "Set an alarm for XXX" | Sets a reminder (e.g., "Set an alarm for 7:15 PM"). |
+| **Weather** | "Weather forecast" | Displays and reads a 7-day weather forecast. |
+| **Weather** | "What's the weather today" | Gives a detailed report for the current day. |
+| **System** | "Shut down" | Safely closes the application. |
+
+---
+
+## 🔄 Command Alternates & "Frank"
+Speech recognition isn't always perfect. HomeAI includes a robust system in `CommandAlternates.py` to handle variations and common misspellings.
+
+- **Dynamic Wake Word**: If you change the name in `_env.py`, make sure to update `AINameAlternates` in `CommandAlternates.py` to help the AI recognize its new name even if it's slightly misheard (e.g., "Frank" vs "Rank").
+- **Flexible Phrases**: Commands like "Get the news" or "What's the weather" automatically map to their primary functions, making the interaction feel more natural.
+
+---
+
+## 🛠️ Project Structure
+- `HomeAI.py`: The main entry point.
+- `TerminalUI.py`: Manages the visual interface.
+- `Commands.py`: Logic for executing specific tasks.
+- `Helper.py`: Core utility functions.
+- `WeatherForecast.py`: Integrates with weather APIs.
+- `SpeechDetector.py` & `TextToSpeech.py`: Handle audio I/O.
