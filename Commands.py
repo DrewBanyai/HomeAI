@@ -1,4 +1,5 @@
-from Helper import GetAIName, TellMeTheTime, GetNewsTopHeadlines, SendTestEmail, GetCryptoPrices, IsGmailLoginDefined, log_debug_message
+from _env import AI_NAMES
+from Helper import TellMeTheTime, GetNewsTopHeadlines, SendTestEmail, GetCryptoPrices, IsGmailLoginDefined, log_debug_message
 from _env import GMAIL_EMAIL
 from CommandAlternates import CommandAlternates, PartialAlternates
 from WeatherForecast import SevenDayForecastString, SingleDayForecastString, SevenDayForecastJSON
@@ -34,7 +35,7 @@ def ExecuteCommand(command, speechCallback, shutdownCallback, alarmCallback, wea
                 return True
 
     if (command == "can you hear me"):
-        speechCallback("I can hear you. I listen for any command following my name, " + GetAIName())
+        speechCallback("I can hear you. I listen for any command following my name, " + AI_NAMES[0])
         return True
 
     if (command == "what time is it"):

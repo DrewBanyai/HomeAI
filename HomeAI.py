@@ -4,7 +4,7 @@ __version__ = "v0.03"
 #########
 
 # Environment variables
-from _env import GREET_USER_ON_STARTUP
+from _env import AI_NAMES, GREET_USER_ON_STARTUP
 
 #  If we've passed in an argument, use the first argument to set the current working directory
 import sys
@@ -24,23 +24,18 @@ from TextToSpeech import TextToSpeech
 from Commands import ExecuteCommand
 from AlarmManager import AlarmManager
 from TerminalUI import TerminalUI
-from CommandAlternates import AINameAlternates
 
 
 
-def StringBeginsWithAIName(string):
+def DetectWakeWordCommand(string):
     if IsAINameDefined() == False:
         return (False, "")
     
-    firstSpace = string.find(" ")
-    if (firstSpace == -1):
-        return (False, "")
-    
-    for alt in AINameAlternates:
+    for alt in AI_NAMES:
         nameLength = len(alt + " ")
     
         # Search for the first instance of the name. It is possible that other words could be picked up prior and we should ignore anything before the wake word.
-        nameIndex = string.find(alt)
+        nameIndex = string.find(alt.lower())
         if (nameIndex == -1):
             continue
     
@@ -65,7 +60,7 @@ class HomeAI:
         if self.ui:
             self.ui.call_from_thread(self.ui.update_status, "Thinking...")
         #  Confirm that the query string begins with the name of the AI. If not, return out
-        queryCheck = StringBeginsWithAIName(query)
+        queryCheck = DetectWakeWordCommand(query)
         if (queryCheck[0] == False):
             log_debug_message("HomeAI", f"Invalid Query Detected (does not begin with AI name): {query}\n")
             if self.ui:
@@ -147,8 +142,10 @@ class HomeAI:
                     self.ui.call_from_thread(self.ui.update_status, "Speaking...")
                 log_debug_message("MainLoop", "Speaking...")
 
-                #self.SpeechDetector.StopListening(True)
-                self.SpeechDetector.ListeningPaused = True
+                # Stop listening entirely to release the audio device
+                if self.SpeechDetector.StopListening:
+                    self.SpeechDetector.StopListening(True)
+                    self.SpeechDetector.StopListening = None
 
                 while (len(self.SpeechQueue) > 0):
                     text = self.SpeechQueue.pop(0)
@@ -161,15 +158,15 @@ class HomeAI:
                     self.TextToSpeech.Speak(text)
                 log_debug_message("MainLoop", "Cleared the speech queue. Returning to listening mode...")
             
-            if (self.SpeechDetector.ListeningPaused == True):
-                #if self.SpeechDetector.BeginListening(self.Respond) == False:
-                #    log_debug_message("MainLoop", "Failed to begin listening. Please ensure you have a working microphone installed on this device.")
-                #    self.Exit = True
-                #else:
-                self.SpeechDetector.ListeningPaused = False
+            # If we are not listening, restart the listener
+            if (self.SpeechDetector.StopListening is None):
+                if self.SpeechDetector.BeginListening(self.Respond) == False:
+                   log_debug_message("MainLoop", "Failed to begin listening. Please ensure you have a working microphone installed on this device.")
+                   # self.Exit = True # Don't exit, just log it
+                
                 if self.ui:
                     self.ui.call_from_thread(self.ui.update_status, "Listening...")
-                log_debug_message("MainLoop", "Listening...")
+                log_debug_message("MainLoop", "Listening restarted.")
 
         self.AlarmManager.Exit = True
         self.SpeechDetector.StopListening(True)

@@ -1,8 +1,15 @@
-import pyttsx3
 import threading
 import queue
 import pythoncom
+import time
+import platform
 from Helper import log_debug_message
+
+# Conditional imports for cross-platform support
+if platform.system() == "Windows":
+    import win32com.client
+else:
+    import pyttsx3
 
 
 class TextToSpeech:
@@ -10,13 +17,15 @@ class TextToSpeech:
         self._request_queue = queue.Queue()
         self._speech_finished_event = threading.Event()
         self._exit_flag = False
+        self._is_windows = platform.system() == "Windows"
         
         # Start a dedicated worker thread for all engine operations
         # This solves the COM thread affinity issue with SAPI5
-        self._worker_thread = threading.Thread(target=self._worker_loop, daemon=True)
+        self._worker_thread = threading.Thread(target=self._worker_loop, daemon=True, name="TTSWorkerThread")
         self._worker_thread.start()
         
-        log_debug_message("TextToSpeech", "TTS Worker thread started.")
+        engine_name = "SAPI.SpVoice (Native)" if self._is_windows else "pyttsx3 (Cross-platform)"
+        log_debug_message("TextToSpeech", f"TTS Worker thread started using {engine_name}.")
 
     def Speak(self, string):
         """
@@ -37,58 +46,68 @@ class TextToSpeech:
     def _worker_loop(self):
         """
         Main loop for the dedicated TTS thread. 
-        Handles sequential initialization, speech, and teardown of engines.
+        Detects platform and uses appropriate engine sequentially.
         """
-        # CRITICAL: SAPI5 requires COM initialization for each thread that uses it
-        pythoncom.CoInitialize()
-        
         try:
             while not self._exit_flag:
-                # Step 1: Pre-initialize a fresh engine
-                log_debug_message("TextToSpeech", "Worker: Initializing fresh engine...")
-                engine = pyttsx3.init('sapi5')
-                voice_list = engine.getProperty("voices")
-                if voice_list:
-                    engine.setProperty("voice", voice_list[0].id)
-                engine.setProperty("rate", 150)
-                log_debug_message("TextToSpeech", "Worker: Engine initialized and ready.")
-
-                # Step 2: Wait for a speech request
-                # We stay in this wait loop until we get a request or need to exit.
+                # Step 1: Wait for a speech request
                 text = None
                 while not self._exit_flag:
                     try:
                         text = self._request_queue.get(timeout=1.0)
-                        break # Got text, proceed to speak
+                        break 
                     except queue.Empty:
-                        continue # Still waiting, check exit flag and loop back
+                        continue 
 
                 if text is not None:
-                    # Step 3: Speak the text
-                    log_debug_message("TextToSpeech", f"Worker: Speaking: {text}")
-                    engine.say(text)
-                    engine.runAndWait()
-                    log_debug_message("TextToSpeech", f"Worker: Finished speaking: {text}")
+                    if self._is_windows:
+                        self._handle_windows_speech(text)
+                    else:
+                        self._handle_unix_speech(text)
 
-                    # Step 4: Signal completion to the caller
+                    # Signal completion
                     self._speech_finished_event.set()
-
-                    # Step 5: Shut down and discard the engine to reset state
-                    # This ensures the next engine starts fresh and stable
-                    engine.stop()
-                    del engine
-                    log_debug_message("TextToSpeech", "Worker: Engine discarded. Preparing next engine...")
-                else:
-                    # If we broke out of the wait loop without text, it means self._exit_flag is True.
-                    engine.stop()
-                    del engine
-
+                    
+                    # Delay to allow resources/audio devices to settle
+                    time.sleep(0.5)
         except Exception as e:
             log_debug_message("TextToSpeech", f"ERROR: TTS Worker loop crashed: {e}")
-            # Ensure the caller isn't hung if the worker dies
             self._speech_finished_event.set()
+
+    def _handle_windows_speech(self, text):
+        """Windows-specific speech using direct SAPI5 for stability."""
+        pythoncom.CoInitialize()
+        try:
+            log_debug_message("TextToSpeech", "Worker: Initializing SAPI.SpVoice...")
+            voice = win32com.client.Dispatch("SAPI.SpVoice")
+            
+            log_debug_message("TextToSpeech", f"Worker: Speaking (Windows/Native): {text}")
+            # 0 = Synchronous speak (blocks until finished)
+            voice.Speak(text, 0)
+            
+            del voice
+            log_debug_message("TextToSpeech", "Worker: SAPI Voice released.")
+        except Exception as e:
+            log_debug_message("TextToSpeech", f"ERROR: Windows SAPI operation failed: {e}")
         finally:
             pythoncom.CoUninitialize()
+
+    def _handle_unix_speech(self, text):
+        """Cross-platform speech fallback using pyttsx3."""
+        try:
+            log_debug_message("TextToSpeech", "Worker: Initializing pyttsx3...")
+            engine = pyttsx3.init()
+            engine.setProperty("rate", 150)
+            
+            log_debug_message("TextToSpeech", f"Worker: Speaking (Unix/pyttsx3): {text}")
+            engine.say(text)
+            engine.runAndWait()
+            
+            engine.stop()
+            del engine
+            log_debug_message("TextToSpeech", "Worker: pyttsx3 engine released.")
+        except Exception as e:
+            log_debug_message("TextToSpeech", f"ERROR: Unix/pyttsx3 operation failed: {e}")
 
     def Shutdown(self):
         """Stops the worker thread."""

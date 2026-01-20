@@ -21,7 +21,7 @@ Before running HomeAI, ensure you have Python installed. You will also need a wo
 ### Configuration (`_env.py`)
 To enable full functionality, you must configure the `_env.py` file with your preferences and API keys:
 
-- **AI Name**: Change `AI_NAME` (default is "Frank") to your preferred wake word.
+- **AI Name**: Change `AI_NAMES` (default is "Frank") to your preferred wake word. You can define multiple names here to allow for variations in pronunciation or entirely different names.
 - **News**: Get a free API key from [newsapi.org](https://newsapi.org/) and set `NEWS_API_KEY`.
 - **Crypto**: Get a free API key from [coinapi.io](https://www.coinapi.io/) and set `COIN_API_KEY`. Define your pairs in `CRYPTO_ASSET_PAIRS`.
 - **Email**: To use the email feature, provide your Gmail address and an [App Password](https://myaccount.google.com/apppasswords) in `GMAIL_EMAIL` and `GMAIL_APP_PASSWORD`.
@@ -63,7 +63,7 @@ When you run `HomeAI.py`, a terminal-based UI will launch, showing:
 ## 🔄 Command Alternates & "Frank"
 Speech recognition isn't always perfect. HomeAI includes a robust system in `CommandAlternates.py` to handle variations and common misspellings.
 
-- **Dynamic Wake Word**: If you change the name in `_env.py`, make sure to update `AINameAlternates` in `CommandAlternates.py` to help the AI recognize its new name even if it's slightly misheard (e.g., "Frank" vs "Rank").
+- **Dynamic Wake Word**: If you change the name in `_env.py`, make sure to update the list with alternates as well to help the AI recognize its new name even if it's slightly misheard (e.g., "Frank" vs "Rank").
 - **Flexible Phrases**: Commands like "Get the news" or "What's the weather" automatically map to their primary functions, making the interaction feel more natural.
 
 ---

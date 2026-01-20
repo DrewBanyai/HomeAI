@@ -12,7 +12,9 @@ class AlarmManager:
         self.AlarmList = []
         self.AlarmCallback = alarmCallback
         self.Exit = False
-        Timer(1.0, self.AlarmCheck).start()
+        timer_thread = Timer(1.0, self.AlarmCheck)
+        timer_thread.name = "AlarmCheckThread"
+        timer_thread.start()
 
     def AlarmCheck(self):
         # Check if any alarms are going off, and if so, pass that data to the callback
@@ -22,7 +24,9 @@ class AlarmManager:
                 self.AlarmCallback(alarm.AlarmSetting + " alarm complete")
         self.AlarmList = list(filter(lambda a: a.AlarmTime > dt, self.AlarmList))
         if (self.Exit == False):
-            Timer(1.0, self.AlarmCheck).start()
+            timer_thread = Timer(1.0, self.AlarmCheck)
+            timer_thread.name = "AlarmCheckThread"
+            timer_thread.start()
 
     def SetAlarm(self, alarmSetting, alarmTime):
         log_debug_message("AlarmManager", f"SetAlarm: {alarmTime}")

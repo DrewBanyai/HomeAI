@@ -7,9 +7,10 @@ from email.message import EmailMessage
 import requests
 from playsound3 import *
 
+from _env import AI_NAMES
 from Pronunciation import *
 
-from _env import NEWS_API_KEY, GMAIL_EMAIL, GMAIL_APP_PASSWORD, AI_NAME, COIN_API_KEY, CRYPTO_ASSET_PAIRS
+from _env import NEWS_API_KEY, GMAIL_EMAIL, GMAIL_APP_PASSWORD, COIN_API_KEY, CRYPTO_ASSET_PAIRS
 
 LOG_FILE_PATH = "debug_log.txt"
 
@@ -58,21 +59,17 @@ def ChangeTime(dt, hour, minute, second, microsecond):
 
 def IsAINameDefined():
     try:
-        AI_NAME
-    except NameError:
-        log_debug_message("Helper", "No AI_NAME provided. Please provide this in the User Defined Data section above.")
+        AI_NAMES[0]
+    except:
+        log_debug_message("Helper", "No AI_NAMES entries provided. Please provide this in _env.py ...")
         return False
     return True
-
-
-def GetAIName():
-    return AI_NAME if IsAINameDefined() else ""
 
 
 def GeneralGreeting():
     generalGreeting = ""
     generalGreeting += "Good " + GeneralTimeOfDay() + ". "
-    #generalGreeting += ("You may call me " + AI_NAME + ". ") if IsAINameDefined() else ("")
+    #generalGreeting += ("You may call me " + AI_NAMES[0] + ". ") if IsAINameDefined() else ("")
     generalGreeting += "How may I help you?"
     return generalGreeting
 

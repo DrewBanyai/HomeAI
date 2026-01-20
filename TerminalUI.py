@@ -186,7 +186,7 @@ class TerminalUI(App):
         log_debug_message("TerminalUI", f"App classes on_mount: {self.classes}")
         self.home_ai.ui = self
         
-        self.home_ai_thread = threading.Thread(target=self.home_ai.run)
+        self.home_ai_thread = threading.Thread(target=self.home_ai.run, name="TerminalUIThread")
         self.home_ai_thread.start()
 
     async def on_unmount(self) -> None:

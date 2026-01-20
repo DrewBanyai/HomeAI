@@ -41,7 +41,7 @@ class SpeechDetector:
     def ProcessAudioInThread(self, recognizer, audio):
         log_debug_message("SpeechDetector", "Detected voice audio. Attempting to process audio into text...")
         
-        processThread = threading.Thread(target=self.ProcessAudio, args=(recognizer, audio))
+        processThread = threading.Thread(target=self.ProcessAudio, args=(recognizer, audio), name="AudioProcessingThread")
         processThread.start()
 
     def ProcessAudio(self, recognizer, audio):
@@ -76,7 +76,6 @@ class SpeechDetector:
             #print("USER QUERY: \"" + query + "\"")
             if (self.QueryCallback != None and len(query) > 0):
                 self.QueryCallback(query)
-                self.Microphone = sr.Microphone(0)
         except Exception as e:
             log_debug_message("SpeechDetector", "ERROR: Failed to process user voice query. Returning to Listening mode")
             log_debug_message("SpeechDetector", str(e))

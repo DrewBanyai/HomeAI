@@ -1,10 +1,3 @@
-from _env import AI_NAME
-
-AINameAlternates = {
-    AI_NAME.lower(): AI_NAME.lower(),
-    "rank": "frank"
-}
-
 CommandAlternates = {
     #  CAN YOU HEAR ME
     "can your hear it": "can you hear me",
