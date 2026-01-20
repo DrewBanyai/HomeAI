@@ -54,7 +54,7 @@ class TextToSpeech:
                 text = None
                 while not self._exit_flag:
                     try:
-                        text = self._request_queue.get(timeout=1.0)
+                        text = self._request_queue.get(timeout=0.5)
                         break 
                     except queue.Empty:
                         continue 
@@ -111,6 +111,9 @@ class TextToSpeech:
 
     def Shutdown(self):
         """Stops the worker thread."""
+        log_debug_message("TextToSpeech", "Shutdown requested for TTS worker...")
         self._exit_flag = True
         if self._worker_thread.is_alive():
+            log_debug_message("TextToSpeech", "Joining TTS worker thread...")
             self._worker_thread.join(timeout=2.0)
+            log_debug_message("TextToSpeech", "TTS worker thread joined.")

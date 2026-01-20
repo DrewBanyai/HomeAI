@@ -31,12 +31,30 @@ class SpeechDetector:
     def BeginListening(self, queryCallback):
         self.QueryCallback = queryCallback
         try:
+            # If we were already listening, stop first
+            if self.StopListening:
+                try:
+                    self.StopListening(wait_for_stop=False)
+                except:
+                    pass
+            
             with self.Microphone as source:
                 self.Recognizer.adjust_for_ambient_noise(source)
             self.StopListening = self.Recognizer.listen_in_background(self.Microphone, self.ProcessAudioInThread, 5)
             return True
         except Exception as e:
+            log_debug_message("SpeechDetector", f"ERROR: Failed to begin listening: {e}")
             return False
+
+    def Shutdown(self):
+        """Stops the background listener thread."""
+        log_debug_message("SpeechDetector", "Shutdown requested for SpeechDetector...")
+        self.Exit = True
+        if self.StopListening:
+            log_debug_message("SpeechDetector", "Stopping background listener...")
+            self.StopListening(wait_for_stop=True)
+            self.StopListening = None
+            log_debug_message("SpeechDetector", "Background listener stopped.")
 
     def ProcessAudioInThread(self, recognizer, audio):
         log_debug_message("SpeechDetector", "Detected voice audio. Attempting to process audio into text...")

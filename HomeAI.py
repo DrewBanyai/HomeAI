@@ -93,7 +93,7 @@ class HomeAI:
 
     def Shutdown(self):
         log_debug_message("HomeAI", "Shutting down program...")
-        self.Exit = True
+        self.ui.exit()
 
     def SetAlarm(self, alarmSetting, alarmTime):
         self.AlarmManager.SetAlarm(alarmSetting, alarmTime)
@@ -169,7 +169,8 @@ class HomeAI:
                 log_debug_message("MainLoop", "Listening restarted.")
 
         self.AlarmManager.Exit = True
-        self.SpeechDetector.StopListening(True)
+        self.SpeechDetector.Shutdown()
+        self.TextToSpeech.Shutdown()
 
 if __name__ == "__main__":
     # Instantiate the AI
