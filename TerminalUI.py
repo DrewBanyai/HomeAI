@@ -186,12 +186,18 @@ class TerminalUI(App):
         log_debug_message("TerminalUI", f"App classes on_mount: {self.classes}")
         self.home_ai.ui = self
         
-        self.home_ai_thread = threading.Thread(target=self.home_ai.run, name="TerminalUIThread")
+        # Set daemon=True so the thread doesn't block program exit
+        self.home_ai_thread = threading.Thread(target=self.home_ai.run, name="TerminalUIThread", daemon=True)
         self.home_ai_thread.start()
 
     async def on_unmount(self) -> None:
         """Called when app is unmounted."""
-        log_debug_message("TerminalUI", "on_unmount called.")
-        self.home_ai.Exit = True
+        log_debug_message("TerminalUI", "on_unmount called. Triggering HomeAI shutdown...")
+        # Call the new consolidated shutdown method
+        self.home_ai.Shutdown()
+        
         if self.home_ai_thread:
-            self.home_ai_thread.join()
+            log_debug_message("TerminalUI", "Waiting for HomeAI thread to join...")
+            # Use a timeout of 2 seconds to avoid an infinite hang
+            self.home_ai_thread.join(timeout=2.0)
+            log_debug_message("TerminalUI", "HomeAI thread join complete or timed out.")

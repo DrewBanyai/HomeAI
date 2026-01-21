@@ -3,17 +3,22 @@ __author__ = "Drew Banyai <DrewBanyai@gmail.com>"
 __version__ = "v0.03"
 #########
 
-# Environment variables
-from _env import AI_NAMES, GREET_USER_ON_STARTUP
-
 #  If we've passed in an argument, use the first argument to set the current working directory
 import sys
 import os
+import time
 if (len(sys.argv) > 1):
     os.chdir(sys.argv[1])
 
-#  Import Helper functionality
+# Environment variables
+from _env import AI_NAMES, GREET_USER_ON_STARTUP
+
+# Import Helper functionality
 from Helper import *
+
+# Import Skills classes
+from Skills.BasicProgram import Skill_BasicProgram
+from Skills.WeatherForecast import Skill_WeatherForecast
 
 # Clear the debug log at the very start of the program
 clear_debug_log()
@@ -25,7 +30,19 @@ from Commands import ExecuteCommand
 from AlarmManager import AlarmManager
 from TerminalUI import TerminalUI
 
+def CreateSkillsList():
+    skillsList = []
 
+    # Add Basic Program skill
+    skill_basic = Skill_BasicProgram()
+    skillsList.append(skill_basic)
+
+    # Add Weather Forecast skill
+    skill_weather = Skill_WeatherForecast()
+    skillsList.append(skill_weather)
+
+    return skillsList
+    
 
 def DetectWakeWordCommand(string):
     if IsAINameDefined() == False:
@@ -54,6 +71,12 @@ class HomeAI:
         self.SpeechQueue = []
         self.AlarmManager = None
         self.ui = None
+        self.callbacks = {
+            "SevenDayForecast": self.WeatherUpdateCallback,
+            "Shutdown": self.ShutdownCallback,
+            "Speech": self.AddSpeechString
+        }
+        self.skills = CreateSkillsList()
 
 
     def Respond(self, query):
@@ -69,7 +92,22 @@ class HomeAI:
         
         #  Determine the command after the AI name in the full voice text, then pass it to our command execution function.
         queryString = queryCheck[1]
-        if (ExecuteCommand(queryString, self.AddSpeechString, self.Shutdown, self.SetAlarm, self.WeatherUpdateCallback) == False):
+
+        true_command = None
+        action = None
+
+        for skill in self.skills:
+            true_command = skill.commandPossibilities.get(queryString)
+            if (true_command):
+                action = skill.commandActionMap.get(true_command)
+                if (action):
+                    self.ui.call_from_thread(self.ui.add_line_to_history, "COMMAND: ", queryString)
+                    speech_string = action(self.callbacks)
+                    if speech_string:
+                        self.AddSpeechString(speech_string)
+                    return
+
+        if (ExecuteCommand(queryString, self.AddSpeechString, self.SetAlarm) == False):
             log_debug_message("HomeAI", f"Unknown Query Detected: {queryString}")
             return
         
@@ -92,10 +130,28 @@ class HomeAI:
             self.ui.call_from_thread(self.ui.update_weather_report, weather_data_json)
 
     def Shutdown(self):
-        log_debug_message("HomeAI", "Shutting down program...")
-        self.ui.exit()
+        log_debug_message("HomeAI", "Shutdown requested for HomeAI...")
+        self.Exit = True
+        
+        # Shutdown subsystems
+        if self.AlarmManager:
+            self.AlarmManager.Exit = True
+        if self.SpeechDetector:
+            self.SpeechDetector.Shutdown()
+        if self.TextToSpeech:
+            self.TextToSpeech.Shutdown()
+        
+        log_debug_message("HomeAI", "HomeAI shutdown sequence core complete.")
+
+    def ShutdownCallback(self):
+        log_debug_message("HomeAI", "ShutdownCallback called from Skill.")
+        if self.ui:
+            self.ui.exit()
+        else:
+            self.Shutdown()
 
     def SetAlarm(self, alarmSetting, alarmTime):
+
         self.AlarmManager.SetAlarm(alarmSetting, alarmTime)
 
 
@@ -144,10 +200,10 @@ class HomeAI:
 
                 # Stop listening entirely to release the audio device
                 if self.SpeechDetector.StopListening:
-                    self.SpeechDetector.StopListening(True)
+                    self.SpeechDetector.StopListening(wait_for_stop=False)
                     self.SpeechDetector.StopListening = None
 
-                while (len(self.SpeechQueue) > 0):
+                while (len(self.SpeechQueue) > 0 and not self.Exit):
                     text = self.SpeechQueue.pop(0)
 
                     # Add the response to the conversation history in the UI
@@ -156,21 +212,25 @@ class HomeAI:
                     log_debug_message("MainLoop", f"RESPONSE: {text}")
 
                     self.TextToSpeech.Speak(text)
-                log_debug_message("MainLoop", "Cleared the speech queue. Returning to listening mode...")
+                log_debug_message("MainLoop", "Cleared the speech queue or shutdown requested.")
             
-            # If we are not listening, restart the listener
-            if (self.SpeechDetector.StopListening is None):
+            # If we are not listening, and not exiting, restart the listener
+            if (self.SpeechDetector.StopListening is None and not self.Exit):
                 if self.SpeechDetector.BeginListening(self.Respond) == False:
                    log_debug_message("MainLoop", "Failed to begin listening. Please ensure you have a working microphone installed on this device.")
-                   # self.Exit = True # Don't exit, just log it
                 
                 if self.ui:
                     self.ui.call_from_thread(self.ui.update_status, "Listening...")
                 log_debug_message("MainLoop", "Listening restarted.")
 
+            # Prevent busy-wait
+            time.sleep(0.1)
+
+        log_debug_message("MainLoop", "Exiting MainLoop. Cleaning up...")
         self.AlarmManager.Exit = True
         self.SpeechDetector.Shutdown()
         self.TextToSpeech.Shutdown()
+
 
 if __name__ == "__main__":
     # Instantiate the AI

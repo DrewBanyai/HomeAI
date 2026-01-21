@@ -19,6 +19,18 @@ class SpeechDetector:
         self.Exit = False
         self.ListeningPaused = False
         self.StopListening = None
+        
+        # Load the model once during initialization
+        log_debug_message("SpeechDetector", "Loading Vosk model...")
+        model_path = os.path.join(os.getcwd(), "model")
+        if not os.path.exists(model_path):
+            log_debug_message("SpeechDetector", f"ERROR: model directory not found at {model_path}")
+            self.model = None
+        else:
+            SetLogLevel(-1)
+            self.model = Model(model_path)
+            log_debug_message("SpeechDetector", "Vosk model loaded successfully.")
+            
         self.Initialize()
 
     def Initialize(self):
@@ -30,6 +42,10 @@ class SpeechDetector:
         
     def BeginListening(self, queryCallback):
         self.QueryCallback = queryCallback
+        if not self.model:
+            log_debug_message("SpeechDetector", "ERROR: Cannot listen because the speech model failed to load.")
+            return False
+
         try:
             # If we were already listening, stop first
             if self.StopListening:
@@ -52,48 +68,52 @@ class SpeechDetector:
         self.Exit = True
         if self.StopListening:
             log_debug_message("SpeechDetector", "Stopping background listener...")
-            self.StopListening(wait_for_stop=True)
+            # Set wait_for_stop to False to avoid hanging if the thread is stuck
+            self.StopListening(wait_for_stop=False)
             self.StopListening = None
             log_debug_message("SpeechDetector", "Background listener stopped.")
 
     def ProcessAudioInThread(self, recognizer, audio):
+        if self.Exit:
+            return
+
         log_debug_message("SpeechDetector", "Detected voice audio. Attempting to process audio into text...")
         
-        processThread = threading.Thread(target=self.ProcessAudio, args=(recognizer, audio), name="AudioProcessingThread")
+        # Using daemon=True so the application can exit even if processing is mid-flight
+        processThread = threading.Thread(
+            target=self.ProcessAudio, 
+            args=(recognizer, audio), 
+            name="AudioProcessingThread",
+            daemon=True
+        )
         processThread.start()
 
     def ProcessAudio(self, recognizer, audio):
-        if (self.ListeningPaused == True):
+        if (self.ListeningPaused == True or self.Exit == True):
             return
 
         if (self.QueryCallback == None):
-            log_debug_message("SpeechDetector", "ERROR: Received audio to process, but there is no query callback to call with the data if we recognized it.")
+            log_debug_message("SpeechDetector", "ERROR: Received audio to process, but there is no query callback.")
             return
         
         if (audio == None):
-            log_debug_message("SpeechDetector", "ERROR: Received audio to process, but the audio received is empty data.")
+            log_debug_message("SpeechDetector", "ERROR: Received audio to process, but the audio data is empty.")
             return
         
         try:
-            SetLogLevel(-1)
-
-            # Create vosk model and recognizer
-            vosk_model = Model(os.path.join(os.getcwd(), "model"))
-            vosk_recognizer = KaldiRecognizer(vosk_model, audio.sample_rate)
+            # Create recognizer with the pre-loaded model
+            vosk_recognizer = KaldiRecognizer(self.model, audio.sample_rate)
 
             # Process audio data
-            # speech_recognition's AudioData needs to be fed to vosk
             raw_audio_data = audio.get_raw_data(convert_rate=audio.sample_rate, convert_width=2)
             vosk_recognizer.AcceptWaveform(raw_audio_data)
             
             # Get result
             result_json = vosk_recognizer.Result()
             resultDict = json.loads(result_json)
-            query = resultDict["text"].lower()
+            query = resultDict.get("text", "").lower()
 
-            #print("USER QUERY: \"" + query + "\"")
-            if (self.QueryCallback != None and len(query) > 0):
+            if (self.QueryCallback != None and len(query) > 0 and not self.Exit):
                 self.QueryCallback(query)
         except Exception as e:
-            log_debug_message("SpeechDetector", "ERROR: Failed to process user voice query. Returning to Listening mode")
-            log_debug_message("SpeechDetector", str(e))
+            log_debug_message("SpeechDetector", f"ERROR: Failed to process user voice query: {e}")

@@ -81,9 +81,23 @@ class TextToSpeech:
             log_debug_message("TextToSpeech", "Worker: Initializing SAPI.SpVoice...")
             voice = win32com.client.Dispatch("SAPI.SpVoice")
             
+            # Constants for SAPI5
+            SPF_ASYNC = 1
+            SPF_PURGEBEFORESPEAK = 2
+            
             log_debug_message("TextToSpeech", f"Worker: Speaking (Windows/Native): {text}")
-            # 0 = Synchronous speak (blocks until finished)
-            voice.Speak(text, 0)
+            
+            # Speak asynchronously so we can check the exit flag
+            voice.Speak(text, SPF_ASYNC)
+            
+            # Wait for speech to finish OR for exit flag to be set
+            while voice.Status.RunningState != 1:  # 1 = SRSEDone (Finished)
+                if self._exit_flag:
+                    log_debug_message("TextToSpeech", "Worker: Exit flag detected during speech. Purging...")
+                    # Purge any remaining speech
+                    voice.Speak("", SPF_PURGEBEFORESPEAK)
+                    break
+                time.sleep(0.1)
             
             del voice
             log_debug_message("TextToSpeech", "Worker: SAPI Voice released.")
@@ -91,6 +105,7 @@ class TextToSpeech:
             log_debug_message("TextToSpeech", f"ERROR: Windows SAPI operation failed: {e}")
         finally:
             pythoncom.CoUninitialize()
+
 
     def _handle_unix_speech(self, text):
         """Cross-platform speech fallback using pyttsx3."""

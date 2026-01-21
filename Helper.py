@@ -31,15 +31,6 @@ def GetDateTime():
     return datetime.datetime.now()
 
 
-def TellMeTheTime(speechCallback):
-    try:
-        currentTime = GetDateTime()
-        timeStatement = "The time is " + GetTimeNaturalEnglish(currentTime)
-        speechCallback(timeStatement)
-    except Exception as e:
-        log_debug_message("Helper", str(e))
-
-
 def GeneralTimeOfDay():
     hour = int(datetime.datetime.now().hour)
     if hour >= 0 and hour < 12:
